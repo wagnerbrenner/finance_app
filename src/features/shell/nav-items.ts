@@ -20,12 +20,12 @@ export type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, enabled: true },
-  { title: "Contas", href: "/app/contas", icon: Wallet, enabled: false },
-  { title: "Transações", href: "/app/transacoes", icon: ArrowLeftRight, enabled: false },
-  { title: "Cartões", href: "/app/cartoes", icon: CreditCard, enabled: false },
-  { title: "Dívidas", href: "/app/dividas", icon: Landmark, enabled: false },
-  { title: "Metas", href: "/app/metas", icon: Target, enabled: false },
-  { title: "Investimentos", href: "/app/investimentos", icon: TrendingUp, enabled: false },
-  { title: "Uber", href: "/app/uber", icon: Car, enabled: false },
-  { title: "Relatórios", href: "/app/relatorios", icon: FileBarChart, enabled: false },
+  { title: "Contas", href: "/app/contas", icon: Wallet, enabled: true },
+  { title: "Transações", href: "/app/transacoes", icon: ArrowLeftRight, enabled: true },
+  { title: "Cartões", href: "/app/cartoes", icon: CreditCard, enabled: true },
+  { title: "Dívidas", href: "/app/dividas", icon: Landmark, enabled: true },
+  { title: "Metas", href: "/app/metas", icon: Target, enabled: true },
+  { title: "Investimentos", href: "/app/investimentos", icon: TrendingUp, enabled: true },
+  { title: "Uber", href: "/app/uber", icon: Car, enabled: true },
+  { title: "Relatórios", href: "/app/relatorios", icon: FileBarChart, enabled: true },
 ];

@@ -7,7 +7,6 @@ import { signUp, type AuthActionState } from "@/features/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GoogleAuthButton } from "@/features/auth/components/google-auth-button";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -25,15 +24,6 @@ export function SignupForm() {
 
   return (
     <div className="flex w-full flex-col gap-6">
-      <GoogleAuthButton label="Continuar com Google" />
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase tracking-widest">
-          <span className="bg-card px-3 text-muted-foreground">ou e-mail</span>
-        </div>
-      </div>
       <form action={formAction} className="flex flex-col gap-4">
         <div className="space-y-2">
           <Label htmlFor="fullName">Nome</Label>
@@ -71,6 +61,14 @@ export function SignupForm() {
         {state.error ? (
           <p className="text-sm text-destructive" role="alert">
             {state.error}
+          </p>
+        ) : null}
+        {state.success && state.message ? (
+          <p className="text-sm text-teal-400" role="status">
+            {state.message}{" "}
+            <Link href="/login" className="underline hover:text-teal-300">
+              Ir para login
+            </Link>
           </p>
         ) : null}
         <SubmitButton />

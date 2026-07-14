@@ -18,7 +18,19 @@ const signUpSchema = credentialsSchema.extend({
 export type AuthActionState = {
   error?: string;
   success?: boolean;
+  message?: string;
 };
+
+function mapAuthError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("rate limit")) {
+    return "Limite de e-mails do Supabase atingido (plano free: ~2/hora). Desative Confirm email no dashboard ou aguarde 1 hora.";
+  }
+  if (lower.includes("already registered") || lower.includes("user already")) {
+    return "Este e-mail já está cadastrado. Faça login.";
+  }
+  return message;
+}
 
 export async function signInWithPassword(
   _prev: AuthActionState,
@@ -61,7 +73,7 @@ export async function signUp(
   const supabase = await createClient();
   const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
@@ -73,29 +85,20 @@ export async function signUp(
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: mapAuthError(error.message) };
+  }
+
+  // Confirm email ligado: não há sessão até o usuário confirmar.
+  if (!data.session) {
+    return {
+      success: true,
+      message:
+        "Conta criada. Verifique seu e-mail para confirmar e depois faça login.",
+    };
   }
 
   revalidatePath("/", "layout");
   redirect("/dashboard");
-}
-
-export async function signInWithGoogle(): Promise<void> {
-  const supabase = await createClient();
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${origin}/auth/callback?next=/dashboard`,
-    },
-  });
-
-  if (error || !data.url) {
-    throw new Error(error?.message ?? "Falha ao iniciar login com Google");
-  }
-
-  redirect(data.url);
 }
 
 export async function signOut(): Promise<void> {

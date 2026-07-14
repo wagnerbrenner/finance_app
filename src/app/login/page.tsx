@@ -35,7 +35,7 @@ export default function LoginPage() {
         <Card className="border-border/70 bg-card/80 backdrop-blur">
           <CardHeader>
             <CardTitle>Entrar</CardTitle>
-            <CardDescription>Use Google ou e-mail e senha.</CardDescription>
+            <CardDescription>Entre com e-mail e senha.</CardDescription>
           </CardHeader>
           <CardContent>
             <LoginForm />

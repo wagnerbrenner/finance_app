@@ -1,9 +1,17 @@
-# Docs: https://supabase.com/docs/guides/auth
+# Supabase setup
 
-# 1. Create a Supabase project
-# 2. Run supabase/migrations/0000_phase0_profiles.sql in the SQL Editor
-# 3. Auth → Providers → enable Email and Google
-# 4. Auth → URL Configuration:
-#    - Site URL: http://localhost:3000
-#    - Redirect URLs: http://localhost:3000/auth/callback
-# 5. Copy .env.example → .env.local and fill values
+## Email rate limit (importante)
+
+O SMTP padrão do Supabase free permite ~2 e-mails/hora. Signup com **Confirm email** ligado estoura isso rápido.
+
+Para uso pessoal:
+1. **Authentication → Providers → Email** → desative **Confirm email**
+2. Ou crie o usuário no dashboard (**Users → Add user**, Auto Confirm)
+3. Ou rode `npx tsx scripts/create-user.mts`
+
+## Checklist
+
+1. Rodar `supabase/migrations/0000_phase0_profiles.sql` no SQL Editor
+2. Email provider ligado; Confirm email OFF em desenvolvimento
+3. URL Configuration: Site URL `http://localhost:3000`, Redirect `http://localhost:3000/auth/callback`
+4. Copiar `.env.example` → `.env.local`
