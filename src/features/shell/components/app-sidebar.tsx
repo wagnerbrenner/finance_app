@@ -18,9 +18,13 @@ import {
 function Brand({ collapsed }: { collapsed?: boolean }) {
   return (
     <Link href="/dashboard" className="flex items-center gap-2.5 px-2">
-      <span className="flex size-8 items-center justify-center rounded-md bg-teal-500/15 font-[family-name:var(--font-display)] text-sm font-semibold text-teal-400">
-        F
-      </span>
+      <img
+        src="/logo.svg"
+        alt=""
+        width={32}
+        height={32}
+        className="size-8 rounded-md"
+      />
       {!collapsed ? (
         <span className="font-[family-name:var(--font-display)] text-base font-semibold tracking-tight">
           Finance OS

@@ -9,7 +9,14 @@ export default function HomePage() {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,_rgba(20,184,166,0.18),_transparent),linear-gradient(to_bottom,_transparent,_oklch(0.13_0.005_260))]"
       />
       <header className="relative z-10 flex items-center justify-between px-6 py-5 md:px-10">
-        <span className="font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight">
+        <span className="flex items-center gap-2.5 font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight">
+          <img
+            src="/logo.svg"
+            alt=""
+            width={28}
+            height={28}
+            className="size-7 rounded-md"
+          />
           Finance OS
         </span>
         <div className="flex items-center gap-2">

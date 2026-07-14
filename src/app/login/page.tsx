@@ -24,8 +24,15 @@ export default function LoginPage() {
         <div className="mb-8 text-center">
           <Link
             href="/"
-            className="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight"
+            className="inline-flex items-center gap-2.5 font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight"
           >
+            <img
+              src="/logo.svg"
+              alt=""
+              width={32}
+              height={32}
+              className="size-8 rounded-md"
+            />
             Finance OS
           </Link>
           <p className="mt-2 text-sm text-muted-foreground">
