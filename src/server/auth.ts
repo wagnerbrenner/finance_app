@@ -1,6 +1,7 @@
+import { cache } from "react";
 import { createClient } from "@/shared/lib/supabase/server";
 
-export async function requireUserId(): Promise<string> {
+export const requireUserId = cache(async (): Promise<string> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -11,7 +12,7 @@ export async function requireUserId(): Promise<string> {
   }
 
   return user.id;
-}
+});
 
 export function toNumber(value: string | number | null | undefined): number {
   if (value == null) return 0;

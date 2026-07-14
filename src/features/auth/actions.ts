@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -108,7 +109,7 @@ export async function signOut(): Promise<void> {
   redirect("/login");
 }
 
-export async function getCurrentProfile() {
+export const getCurrentProfile = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -141,4 +142,4 @@ export async function getCurrentProfile() {
     updatedAt: new Date(),
     deletedAt: null,
   };
-}
+});

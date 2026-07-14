@@ -1,5 +1,7 @@
 import { AppSidebar } from "@/features/shell/components/app-sidebar";
 import { AppTopbar } from "@/features/shell/components/app-topbar";
+import { MobileBottomNav } from "@/features/shell/components/mobile-bottom-nav";
+import { LaunchHost } from "@/features/shell/components/launch-host";
 import { getCurrentProfile } from "@/features/auth/actions";
 import { redirect } from "next/navigation";
 
@@ -16,7 +18,7 @@ export async function AppShell({ children, title }: AppShellProps) {
   }
 
   return (
-    <div className="flex min-h-svh bg-background">
+    <div className="flex min-h-dvh bg-background">
       <AppSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <AppTopbar
@@ -25,7 +27,11 @@ export async function AppShell({ children, title }: AppShellProps) {
           fullName={profile.fullName}
           avatarUrl={profile.avatarUrl}
         />
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <main className="flex-1 overflow-x-hidden p-3 pb-28 sm:p-4 md:p-6 md:pb-6">
+          {children}
+        </main>
+        <MobileBottomNav />
+        <LaunchHost />
       </div>
     </div>
   );

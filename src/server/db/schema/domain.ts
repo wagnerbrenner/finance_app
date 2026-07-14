@@ -138,6 +138,7 @@ export const debts = pgTable("debts", {
   currentInstallment: integer("current_installment").default(0),
   installmentAmount: numeric("installment_amount", { precision: 14, scale: 2 }),
   startDate: date("start_date", { mode: "string" }),
+  dueDate: date("due_date", { mode: "string" }),
   type: text("type").notNull().default("other"),
   priority: text("priority").notNull().default("medium"),
   notes: text("notes"),
@@ -200,6 +201,7 @@ export const uberPeriods = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id").notNull(),
+    source: text("source").notNull().default("uber"),
     periodMonth: date("period_month", { mode: "string" }).notNull(),
     grossRevenue: numeric("gross_revenue", { precision: 14, scale: 2 })
       .notNull()
@@ -228,8 +230,64 @@ export const uberPeriods = pgTable(
     notes: text("notes"),
     ...audit,
   },
-  (t) => [uniqueIndex("uber_periods_user_month_uidx").on(t.userId, t.periodMonth)],
+  (t) => [
+    uniqueIndex("uber_periods_user_source_month_uidx").on(t.userId, t.source, t.periodMonth),
+  ],
 );
+
+export const recurringBills = pgTable("recurring_bills", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
+  name: text("name").notNull(),
+  accountId: uuid("account_id"),
+  categoryId: uuid("category_id"),
+  dayOfMonth: integer("day_of_month").notNull().default(1),
+  estimatedAmount: numeric("estimated_amount", { precision: 14, scale: 2 })
+    .notNull()
+    .default("0"),
+  isActive: boolean("is_active").notNull().default(true),
+  notes: text("notes"),
+  ...audit,
+});
+
+export const recurringBillOccurrences = pgTable(
+  "recurring_bill_occurrences",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull(),
+    billId: uuid("bill_id").notNull(),
+    dueDate: date("due_date", { mode: "string" }).notNull(),
+    expectedAmount: numeric("expected_amount", { precision: 14, scale: 2 })
+      .notNull()
+      .default("0"),
+    actualAmount: numeric("actual_amount", { precision: 14, scale: 2 }),
+    status: text("status").notNull().default("scheduled"),
+    transactionId: uuid("transaction_id"),
+    notifiedAt: timestamp("notified_at", { withTimezone: true, mode: "date" }),
+    confirmedAt: timestamp("confirmed_at", { withTimezone: true, mode: "date" }),
+    ...audit,
+  },
+  (t) => [uniqueIndex("recurring_bill_occurrences_bill_due_uidx").on(t.billId, t.dueDate)],
+);
+
+export const consortia = pgTable("consortia", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
+  name: text("name").notNull(),
+  administrator: text("administrator"),
+  groupNumber: text("group_number"),
+  letterNumber: text("letter_number"),
+  creditAmount: numeric("credit_amount", { precision: 14, scale: 2 }).notNull().default("0"),
+  installmentAmount: numeric("installment_amount", { precision: 14, scale: 2 }).notNull().default("0"),
+  totalInstallments: integer("total_installments").notNull().default(0),
+  paidInstallments: integer("paid_installments").notNull().default(0),
+  nextDueDate: date("next_due_date", { mode: "string" }),
+  contemplated: boolean("contemplated").notNull().default(false),
+  contemplatedAt: date("contemplated_at", { mode: "string" }),
+  status: text("status").notNull().default("active"),
+  notes: text("notes"),
+  ...audit,
+});
 
 export const financeSettings = pgTable("finance_settings", {
   userId: uuid("user_id").primaryKey(),
@@ -242,6 +300,9 @@ export const financeSettings = pgTable("finance_settings", {
   salaryIncreaseRate: numeric("salary_increase_rate", { precision: 8, scale: 4 })
     .notNull()
     .default("5"),
+  hasFreelance: boolean("has_freelance").notNull().default(false),
+  hasUber: boolean("has_uber").notNull().default(false),
+  incomeOnboardingDone: boolean("income_onboarding_done").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
     .defaultNow()
     .notNull(),

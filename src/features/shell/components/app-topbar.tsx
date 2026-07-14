@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Menu, UserRound } from "lucide-react";
+import { LogOut, Menu, Plus, UserRound } from "lucide-react";
 import { signOut } from "@/features/auth/actions";
 import { useUiStore } from "@/shared/stores/ui-store";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { NotificationsBell } from "@/features/notifications/components/notifications-bell";
 
 type UserMenuProps = {
   email: string;
@@ -73,10 +74,11 @@ type AppTopbarProps = {
 
 export function AppTopbar({ title, email, fullName, avatarUrl }: AppTopbarProps) {
   const setMobileOpen = useUiStore((s) => s.setMobileSidebarOpen);
+  const openLaunch = useUiStore((s) => s.openLaunch);
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur-md md:px-6">
-      <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-2 border-b border-border/60 bg-background/80 px-3 backdrop-blur-md sm:gap-3 md:px-6">
+      <div className="flex min-w-0 items-center gap-1.5">
         <Button
           type="button"
           variant="ghost"
@@ -87,11 +89,31 @@ export function AppTopbar({ title, email, fullName, avatarUrl }: AppTopbarProps)
         >
           <Menu className="size-4" />
         </Button>
-        <h1 className="font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight">
+        <h1 className="truncate font-[family-name:var(--font-display)] text-base font-semibold tracking-tight sm:text-lg">
           {title}
         </h1>
       </div>
-      <UserMenu email={email} fullName={fullName} avatarUrl={avatarUrl} />
+      <div className="flex shrink-0 items-center gap-0.5">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          className="md:hidden"
+          onClick={() => openLaunch()}
+          aria-label="Novo lançamento"
+        >
+          <Plus className="size-5 text-teal-400" />
+        </Button>
+        <Button
+          type="button"
+          className="hidden md:inline-flex"
+          onClick={() => openLaunch()}
+        >
+          Novo lançamento
+        </Button>
+        <NotificationsBell />
+        <UserMenu email={email} fullName={fullName} avatarUrl={avatarUrl} />
+      </div>
     </header>
   );
 }
