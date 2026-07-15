@@ -62,10 +62,7 @@ Aplique em **Production** (e Preview se quiser testar PRs).
 
 **E-mail de confirmação branded:**
 
-1. Ative **Confirm email** em Authentication → Providers → Email  
-2. Authentication → **SMTP Settings**: configure SMTP do Resend (host `smtp.resend.com`, user `resend`, senha = API key)  
-3. Authentication → **Email Templates → Confirm signup**: cole o HTML de [`docs/email-confirm-template.html`](email-confirm-template.html)  
-4. Links de confirmação usam `NEXT_PUBLIC_SITE_URL` + `/auth/callback`
+Siga [`docs/email-confirmacao.md`](email-confirmacao.md): Site URL de prod, template HTML em Email Templates, e SMTP Resend (opcional, para sair do remetente Supabase).
 
 **Lembretes de vencimento:** cron diário em `vercel.json` (`/api/cron/due-reminders` às 11:00 UTC ≈ 08:00 BRT). Aplique a migration `0005_email_reminder_log.sql`.
 
