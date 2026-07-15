@@ -5,8 +5,8 @@ import { CreateEntityDialog } from "@/shared/components/create-entity-dialog";
 import { ConfirmDeleteButton } from "@/shared/components/confirm-delete-button";
 import { FormField } from "@/shared/components/form-field";
 import { FormSelect } from "@/shared/components/form-select";
-import { createAccount, deleteAccount } from "@/features/finance/actions";
-import { requireUserId } from "@/server/auth";
+import { createAccount, deleteAccount, updateAccount } from "@/features/finance/actions";
+import { requireUserId, toNumber } from "@/server/auth";
 import { db } from "@/server/db";
 import { accounts } from "@/server/db/schema";
 import { getAccountBalances } from "@/server/services/recurring-bills.service";
@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { EditEntityDialog } from "@/shared/components/edit-entity-dialog";
 
 export default async function AccountsPage() {
   const userId = await requireUserId();
@@ -111,12 +112,54 @@ export default async function AccountsPage() {
                         {formatBRL(balanceByAccount.get(row.id) ?? 0)}
                       </TableCell>
                       <TableCell className="text-right">
-                        <ConfirmDeleteButton
-                          id={row.id}
-                          path="/app/contas"
-                          action={deleteAccount}
-                          label="conta"
-                        />
+                        <div className="inline-flex items-center justify-end gap-0.5">
+                          <EditEntityDialog
+                            title="Editar conta"
+                            path="/app/contas"
+                            action={updateAccount}
+                            id={row.id}
+                          >
+                            <FormField
+                              name="name"
+                              label="Nome"
+                              required
+                              className="sm:col-span-2"
+                              defaultValue={row.name}
+                            />
+                            <FormField
+                              name="institution"
+                              label="Instituição"
+                              defaultValue={row.institution ?? undefined}
+                            />
+                            <FormSelect
+                              name="type"
+                              label="Tipo"
+                              required
+                              defaultValue={row.type}
+                              options={[
+                                { value: "checking", label: "Conta corrente" },
+                                { value: "savings", label: "Poupança" },
+                                { value: "cash", label: "Dinheiro" },
+                                { value: "investment", label: "Investimento" },
+                                { value: "other", label: "Outra" },
+                              ]}
+                            />
+                            <FormField
+                              name="amount"
+                              label="Saldo inicial"
+                              type="number"
+                              step="0.01"
+                              defaultValue={String(toNumber(row.initialBalance))}
+                              required
+                            />
+                          </EditEntityDialog>
+                          <ConfirmDeleteButton
+                            id={row.id}
+                            path="/app/contas"
+                            action={deleteAccount}
+                            label="conta"
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

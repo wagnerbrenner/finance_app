@@ -2,6 +2,7 @@ import { and, desc, eq, isNull } from "drizzle-orm";
 import { AppShell } from "@/features/shell/components/app-shell";
 import { PageHeader } from "@/shared/components/page-header";
 import { CreateEntityDialog } from "@/shared/components/create-entity-dialog";
+import { EditEntityDialog } from "@/shared/components/edit-entity-dialog";
 import { ConfirmDeleteButton } from "@/shared/components/confirm-delete-button";
 import { FormField } from "@/shared/components/form-field";
 import { FormSelect } from "@/shared/components/form-select";
@@ -11,6 +12,9 @@ import {
   deleteCard,
   deleteInstallment,
   deleteRecurrence,
+  updateCard,
+  updateInstallment,
+  updateRecurrence,
 } from "@/features/finance/actions";
 import { requireUserId, toNumber } from "@/server/auth";
 import { db } from "@/server/db";
@@ -137,12 +141,60 @@ export default async function CardsPage() {
                             {formatBRL(toNumber(card.limitAmount))}
                           </TableCell>
                           <TableCell className="text-right">
-                            <ConfirmDeleteButton
-                              id={card.id}
-                              path="/app/cartoes"
-                              action={deleteCard}
-                              label="cartão"
-                            />
+                            <div className="inline-flex items-center justify-end gap-0.5">
+                              <EditEntityDialog
+                                title="Editar cartão"
+                                path="/app/cartoes"
+                                action={updateCard}
+                                id={card.id}
+                              >
+                                <FormField
+                                  name="name"
+                                  label="Nome"
+                                  required
+                                  defaultValue={card.name}
+                                />
+                                <FormSelect
+                                  name="accountId"
+                                  label="Conta de pagamento"
+                                  defaultValue={card.accountId ?? undefined}
+                                  options={accountOptions}
+                                />
+                                <FormField
+                                  name="limitAmount"
+                                  label="Limite"
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  required
+                                  defaultValue={String(toNumber(card.limitAmount))}
+                                />
+                                <FormField
+                                  name="closingDay"
+                                  label="Dia de fechamento"
+                                  type="number"
+                                  min="1"
+                                  max="31"
+                                  required
+                                  defaultValue={String(card.closingDay)}
+                                />
+                                <FormField
+                                  name="dueDay"
+                                  label="Dia de vencimento"
+                                  type="number"
+                                  min="1"
+                                  max="31"
+                                  required
+                                  defaultValue={String(card.dueDay)}
+                                />
+                              </EditEntityDialog>
+                              <ConfirmDeleteButton
+                                id={card.id}
+                                path="/app/cartoes"
+                                action={deleteCard}
+                                label="cartão"
+                              />
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -207,12 +259,59 @@ export default async function CardsPage() {
                             {formatBRL(toNumber(plan.installmentAmount))}
                           </TableCell>
                           <TableCell className="text-right">
-                            <ConfirmDeleteButton
-                              id={plan.id}
-                              path="/app/cartoes"
-                              action={deleteInstallment}
-                              label="parcelamento"
-                            />
+                            <div className="inline-flex items-center justify-end gap-0.5">
+                              <EditEntityDialog
+                                title="Editar parcelamento"
+                                path="/app/cartoes"
+                                action={updateInstallment}
+                                id={plan.id}
+                              >
+                                <FormField
+                                  name="description"
+                                  label="Descrição"
+                                  required
+                                  className="sm:col-span-2"
+                                  defaultValue={plan.description}
+                                />
+                                <FormSelect
+                                  name="creditCardId"
+                                  label="Cartão"
+                                  defaultValue={plan.creditCardId ?? undefined}
+                                  options={cardOptions}
+                                />
+                                <FormField
+                                  name="totalAmount"
+                                  label="Valor total"
+                                  type="number"
+                                  min="0.01"
+                                  step="0.01"
+                                  required
+                                  defaultValue={String(toNumber(plan.totalAmount))}
+                                />
+                                <FormField
+                                  name="totalInstallments"
+                                  label="Quantidade de parcelas"
+                                  type="number"
+                                  min="1"
+                                  step="1"
+                                  required
+                                  defaultValue={String(plan.totalInstallments)}
+                                />
+                                <FormField
+                                  name="startDate"
+                                  label="Primeiro vencimento"
+                                  type="date"
+                                  required
+                                  defaultValue={plan.startDate}
+                                />
+                              </EditEntityDialog>
+                              <ConfirmDeleteButton
+                                id={plan.id}
+                                path="/app/cartoes"
+                                action={deleteInstallment}
+                                label="parcelamento"
+                              />
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -253,12 +352,80 @@ export default async function CardsPage() {
                             {formatBRL(toNumber(item.amount))}
                           </TableCell>
                           <TableCell className="text-right">
-                            <ConfirmDeleteButton
-                              id={item.id}
-                              path="/app/cartoes"
-                              action={deleteRecurrence}
-                              label="recorrência"
-                            />
+                            <div className="inline-flex items-center justify-end gap-0.5">
+                              <EditEntityDialog
+                                title="Editar recorrência"
+                                path="/app/cartoes"
+                                action={updateRecurrence}
+                                id={item.id}
+                              >
+                                <FormField
+                                  name="description"
+                                  label="Descrição"
+                                  required
+                                  className="sm:col-span-2"
+                                  defaultValue={item.description}
+                                />
+                                <FormSelect
+                                  name="type"
+                                  label="Tipo"
+                                  required
+                                  defaultValue={item.type}
+                                  options={[
+                                    { value: "income", label: "Receita" },
+                                    { value: "expense", label: "Despesa" },
+                                  ]}
+                                />
+                                <FormField
+                                  name="amount"
+                                  label="Valor"
+                                  type="number"
+                                  min="0.01"
+                                  step="0.01"
+                                  required
+                                  defaultValue={String(toNumber(item.amount))}
+                                />
+                                <FormSelect
+                                  name="frequency"
+                                  label="Periodicidade"
+                                  required
+                                  defaultValue={item.frequency || "monthly"}
+                                  options={[
+                                    { value: "weekly", label: "Semanal" },
+                                    { value: "monthly", label: "Mensal" },
+                                    { value: "yearly", label: "Anual" },
+                                  ]}
+                                />
+                                <FormField
+                                  name="dayOfMonth"
+                                  label="Dia do mês"
+                                  type="number"
+                                  min="1"
+                                  max="31"
+                                  required
+                                  defaultValue={String(item.dayOfMonth ?? 1)}
+                                />
+                                <FormField
+                                  name="startDate"
+                                  label="Início"
+                                  type="date"
+                                  required
+                                  defaultValue={item.startDate}
+                                />
+                                <FormSelect
+                                  name="accountId"
+                                  label="Conta"
+                                  defaultValue={item.accountId ?? undefined}
+                                  options={accountOptions}
+                                />
+                              </EditEntityDialog>
+                              <ConfirmDeleteButton
+                                id={item.id}
+                                path="/app/cartoes"
+                                action={deleteRecurrence}
+                                label="recorrência"
+                              />
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}

@@ -45,7 +45,7 @@ export function TransactionDialog({
 
   const [lookups, setLookups] = useState<LaunchLookups | null>(null);
   const [loadingLookups, startLoad] = useTransition();
-  const [type, setType] = useState<"income" | "expense">("expense");
+  const [type, setType] = useState<"income" | "expense" | "goal">("expense");
   const [incomeOrigin, setIncomeOrigin] = useState<"salary" | "freelance" | "uber">("salary");
   const [isRecurring, setIsRecurring] = useState(false);
 
@@ -70,7 +70,9 @@ export function TransactionDialog({
     data.set("type", type);
     if (type === "income") data.set("incomeOrigin", resolvedIncomeOrigin);
     if (type === "expense") data.set("isRecurring", isRecurring ? "true" : "false");
-    if (await actionToast(() => createLaunch(data), "Lançamento registrado.")) {
+    const okMsg =
+      type === "goal" ? "Aporte registrado." : "Lançamento registrado.";
+    if (await actionToast(() => createLaunch(data), okMsg)) {
       setOpen(false);
       setType("expense");
       setIncomeOrigin("salary");
@@ -81,6 +83,7 @@ export function TransactionDialog({
   const accounts = lookups?.accounts ?? accountsProp ?? [];
   const categories = lookups?.categories ?? categoriesProp ?? [];
   const cards = lookups?.cards ?? cardsProp ?? [];
+  const goalsList = lookups?.goals ?? [];
   const today = localDateISO();
   const monthStart = `${today.slice(0, 8)}01`;
 
@@ -101,10 +104,11 @@ export function TransactionDialog({
             label="Tipo"
             required
             value={type}
-            onChange={(e) => setType(e.target.value as "income" | "expense")}
+            onChange={(e) => setType(e.target.value as "income" | "expense" | "goal")}
             options={[
               { value: "income", label: "Receita" },
               { value: "expense", label: "Despesa" },
+              { value: "goal", label: "Aporte em meta" },
             ]}
           />
 
@@ -125,7 +129,7 @@ export function TransactionDialog({
                 ...(lookups?.hasUber ? [{ value: "uber", label: "Uber" }] : []),
               ]}
             />
-          ) : (
+          ) : type === "expense" ? (
             <FormSelect
               name="status"
               label="Situação"
@@ -136,11 +140,20 @@ export function TransactionDialog({
                 { value: "pending", label: "Pendente" },
               ]}
             />
+          ) : (
+            <FormSelect
+              name="goalId"
+              label="Meta"
+              required
+              options={goalsList.map(({ id, name }) => ({ value: id, label: name }))}
+            />
           )}
 
           <FormField
             name="amount"
-            label={type === "income" ? "Valor da receita" : "Valor"}
+            label={
+              type === "income" ? "Valor da receita" : type === "goal" ? "Valor do aporte" : "Valor"
+            }
             type="number"
             inputMode="decimal"
             step="0.01"
@@ -149,6 +162,7 @@ export function TransactionDialog({
           />
           <FormField name="date" label="Data" type="date" defaultValue={today} required />
 
+          {type !== "goal" ? (
           <FormField
             name="description"
             label="Descrição"
@@ -174,6 +188,7 @@ export function TransactionDialog({
             }
             key={`${type}-${resolvedIncomeOrigin}`}
           />
+          ) : null}
 
           {type === "income" && resolvedIncomeOrigin === "salary" ? (
             <>
@@ -318,6 +333,15 @@ export function TransactionDialog({
             </>
           ) : null}
 
+          {type === "goal" ? (
+            <FormSelect
+              name="accountId"
+              label="Conta"
+              className="sm:col-span-2"
+              options={accounts.map(({ id, name }) => ({ value: id, label: name }))}
+            />
+          ) : null}
+
           {type === "expense" ? (
             <>
               <FormSelect
@@ -378,7 +402,11 @@ export function TransactionDialog({
             className="h-11 w-full sm:ml-auto sm:w-auto"
             disabled={loadingLookups && accounts.length === 0 && !lookups}
           >
-            {type === "expense" && isRecurring ? "Criar conta recorrente" : "Salvar lançamento"}
+            {type === "goal"
+              ? "Registrar aporte"
+              : type === "expense" && isRecurring
+                ? "Criar conta recorrente"
+                : "Salvar lançamento"}
           </Button>
         </div>
       </form>

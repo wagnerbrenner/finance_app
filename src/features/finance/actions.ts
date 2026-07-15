@@ -19,14 +19,14 @@ import {
   transactions,
   uberPeriods,
 } from "@/server/db/schema";
-import { requireUserId } from "@/server/auth";
+import { requireUserId, toNumber } from "@/server/auth";
 import type { ActionResult } from "@/features/finance/types";
 import {
   ensureOccurrenceForBill,
   ensureUpcomingOccurrences,
   nextDueDate,
 } from "@/server/services/recurring-bills.service";
-import { format, startOfMonth } from "date-fns";
+import { addMonths, format, startOfMonth } from "date-fns";
 import { localDateISO, parseDateInput } from "@/shared/lib/formatters";
 
 export type { ActionResult } from "@/features/finance/types";
@@ -130,6 +130,45 @@ export async function createTransaction(data: FormData): Promise<ActionResult> {
   });
 }
 
+export async function updateTransaction(data: FormData): Promise<ActionResult> {
+  return result(data, async (userId) => {
+    const parsed = z
+      .object({
+        id: z.string().uuid(),
+        description: z.string().min(1, "Informe a descrição."),
+        amount: money.positive("Informe um valor maior que zero."),
+        date: z.string().min(1),
+        type: z.enum(["income", "expense"]),
+        status: z.enum(["cleared", "pending"]),
+      })
+      .parse({
+        id: text(data, "id"),
+        description: text(data, "description"),
+        amount: data.get("amount"),
+        date: dateOf(data, "date"),
+        type: text(data, "type"),
+        status: text(data, "status") || "cleared",
+      });
+    await db
+      .update(transactions)
+      .set({
+        description: parsed.description,
+        amount: String(parsed.amount),
+        date: parsed.date,
+        type: parsed.type,
+        status: parsed.status,
+        accountId: optional(data, "accountId"),
+        categoryId: optional(data, "categoryId"),
+        creditCardId: optional(data, "creditCardId"),
+        notes: optional(data, "notes"),
+        updatedAt: new Date(),
+      })
+      .where(
+        and(eq(transactions.id, parsed.id), eq(transactions.userId, userId), isNull(transactions.deletedAt)),
+      );
+  });
+}
+
 export async function deleteTransaction(data: FormData): Promise<ActionResult> {
   return result(data, async (userId) => {
     await db
@@ -152,6 +191,24 @@ export async function createCard(data: FormData): Promise<ActionResult> {
       dueDay: z.coerce.number().min(1).max(31).parse(data.get("dueDay")),
       accountId: optional(data, "accountId"),
     });
+  });
+}
+
+export async function updateCard(data: FormData): Promise<ActionResult> {
+  return result(data, async (userId) => {
+    const id = z.string().uuid().parse(text(data, "id"));
+    const amount = money.parse(data.get("limitAmount"));
+    await db
+      .update(creditCards)
+      .set({
+        name: z.string().min(1).parse(text(data, "name")),
+        limitAmount: String(amount),
+        closingDay: z.coerce.number().min(1).max(31).parse(data.get("closingDay")),
+        dueDay: z.coerce.number().min(1).max(31).parse(data.get("dueDay")),
+        accountId: optional(data, "accountId"),
+        updatedAt: new Date(),
+      })
+      .where(and(eq(creditCards.id, id), eq(creditCards.userId, userId), isNull(creditCards.deletedAt)));
   });
 }
 
@@ -180,6 +237,26 @@ export async function createInstallment(data: FormData): Promise<ActionResult> {
   });
 }
 
+export async function updateInstallment(data: FormData): Promise<ActionResult> {
+  return result(data, async (userId) => {
+    const id = z.string().uuid().parse(text(data, "id"));
+    const total = money.positive().parse(data.get("totalAmount"));
+    const count = z.coerce.number().int().min(1).parse(data.get("totalInstallments"));
+    await db
+      .update(installments)
+      .set({
+        creditCardId: optional(data, "creditCardId"),
+        description: z.string().min(1).parse(text(data, "description")),
+        totalAmount: String(total),
+        installmentAmount: String(total / count),
+        totalInstallments: count,
+        startDate: dateOf(data, "startDate"),
+        updatedAt: new Date(),
+      })
+      .where(and(eq(installments.id, id), eq(installments.userId, userId), isNull(installments.deletedAt)));
+  });
+}
+
 export async function deleteInstallment(data: FormData): Promise<ActionResult> {
   return result(data, async (userId) => {
     await db
@@ -202,6 +279,26 @@ export async function createRecurrence(data: FormData): Promise<ActionResult> {
       startDate: dateOf(data, "startDate"),
       accountId: optional(data, "accountId"),
     });
+  });
+}
+
+export async function updateRecurrence(data: FormData): Promise<ActionResult> {
+  return result(data, async (userId) => {
+    const id = z.string().uuid().parse(text(data, "id"));
+    const amount = money.positive().parse(data.get("amount"));
+    await db
+      .update(recurrences)
+      .set({
+        type: z.enum(["income", "expense"]).parse(text(data, "type")),
+        amount: String(amount),
+        description: z.string().min(1).parse(text(data, "description")),
+        frequency: text(data, "frequency") || "monthly",
+        dayOfMonth: z.coerce.number().min(1).max(31).parse(data.get("dayOfMonth")),
+        startDate: dateOf(data, "startDate"),
+        accountId: optional(data, "accountId"),
+        updatedAt: new Date(),
+      })
+      .where(and(eq(recurrences.id, id), eq(recurrences.userId, userId), isNull(recurrences.deletedAt)));
   });
 }
 
@@ -232,6 +329,76 @@ export async function createDebt(data: FormData): Promise<ActionResult> {
   });
 }
 
+export async function updateDebt(data: FormData): Promise<ActionResult> {
+  return result(data, async (userId) => {
+    const id = z.string().uuid().parse(text(data, "id"));
+    const balance = money.positive().parse(data.get("balance"));
+    await db
+      .update(debts)
+      .set({
+        name: z.string().min(1).parse(text(data, "name")),
+        balance: String(balance),
+        originalAmount: String(money.parse(data.get("originalAmount") || balance)),
+        interestRate: String(money.parse(data.get("interestRate") || 0)),
+        installmentAmount: optional(data, "installmentAmount"),
+        creditor: optional(data, "creditor"),
+        dueDate: optional(data, "dueDate") ? dateOf(data, "dueDate") : null,
+        type: text(data, "type") || "other",
+        priority: text(data, "priority") || "medium",
+        updatedAt: new Date(),
+      })
+      .where(and(eq(debts.id, id), eq(debts.userId, userId), isNull(debts.deletedAt)));
+  });
+}
+
+export async function payDebtDue(data: FormData): Promise<ActionResult> {
+  return result(
+    data,
+    async (userId) => {
+      const id = z.string().uuid().parse(text(data, "id"));
+      const amount = money.positive("Informe o valor pago.").parse(data.get("amount"));
+      const paidDate = dateOf(data, "date");
+      const accountId = optional(data, "accountId");
+
+      const [debt] = await db
+        .select()
+        .from(debts)
+        .where(and(eq(debts.id, id), eq(debts.userId, userId), isNull(debts.deletedAt)))
+        .limit(1);
+      if (!debt) throw new Error("Dívida não encontrada.");
+
+      const balance = Math.max(0, toNumber(debt.balance) - amount);
+      const dueBase = debt.dueDate
+        ? new Date(`${debt.dueDate}T12:00:00`)
+        : new Date(`${paidDate}T12:00:00`);
+      const nextDue = format(addMonths(dueBase, 1), "yyyy-MM-dd");
+      const currentInstallment = (debt.currentInstallment ?? 0) + 1;
+
+      await db.insert(transactions).values({
+        userId,
+        type: "expense",
+        amount: String(amount),
+        date: paidDate,
+        status: "cleared",
+        description: `Pagamento · ${debt.name}`,
+        accountId,
+        notes: optional(data, "notes"),
+      });
+
+      await db
+        .update(debts)
+        .set({
+          balance: String(balance),
+          dueDate: nextDue,
+          currentInstallment,
+          updatedAt: new Date(),
+        })
+        .where(and(eq(debts.id, id), eq(debts.userId, userId)));
+    },
+    ["/app/dividas", "/app/transacoes", "/dashboard"],
+  );
+}
+
 export async function deleteDebt(data: FormData): Promise<ActionResult> {
   return result(data, async (userId) => {
     await db
@@ -255,6 +422,68 @@ export async function createGoal(data: FormData): Promise<ActionResult> {
   });
 }
 
+export async function updateGoal(data: FormData): Promise<ActionResult> {
+  return result(data, async (userId) => {
+    const id = z.string().uuid().parse(text(data, "id"));
+    await db
+      .update(goals)
+      .set({
+        name: z.string().min(1).parse(text(data, "name")),
+        targetAmount: String(money.positive().parse(data.get("targetAmount"))),
+        currentAmount: String(money.parse(data.get("currentAmount") || 0)),
+        monthlyContribution: String(money.parse(data.get("monthlyContribution") || 0)),
+        deadline: optional(data, "deadline") ? dateOf(data, "deadline") : null,
+        type: text(data, "type") || "other",
+        updatedAt: new Date(),
+      })
+      .where(and(eq(goals.id, id), eq(goals.userId, userId), isNull(goals.deletedAt)));
+  });
+}
+
+export async function contributeToGoal(data: FormData): Promise<ActionResult> {
+  return result(
+    data,
+    async (userId) => {
+      const goalId = z.string().uuid("Selecione a meta.").parse(text(data, "goalId") || text(data, "id"));
+      const amount = money.positive("Informe o valor do aporte.").parse(data.get("amount"));
+      const paidDate = dateOf(data, "date");
+      const accountId = optional(data, "accountId");
+
+      const [goal] = await db
+        .select()
+        .from(goals)
+        .where(and(eq(goals.id, goalId), eq(goals.userId, userId), isNull(goals.deletedAt)))
+        .limit(1);
+      if (!goal) throw new Error("Meta não encontrada.");
+
+      const categoryId = (await findCategoryId(userId, "Outros")) ?? (await findCategoryId(userId, "Investimentos"));
+      const description = text(data, "description") || `Aporte · ${goal.name}`;
+
+      await db.insert(transactions).values({
+        userId,
+        type: "expense",
+        amount: String(amount),
+        date: paidDate,
+        status: "cleared",
+        description,
+        accountId,
+        categoryId,
+        goalId,
+        notes: optional(data, "notes"),
+      });
+
+      await db
+        .update(goals)
+        .set({
+          currentAmount: String(toNumber(goal.currentAmount) + amount),
+          updatedAt: new Date(),
+        })
+        .where(and(eq(goals.id, goalId), eq(goals.userId, userId)));
+    },
+    ["/app/metas", "/app/transacoes", "/dashboard"],
+  );
+}
+
 export async function deleteGoal(data: FormData): Promise<ActionResult> {
   return result(data, async (userId) => {
     await db
@@ -276,6 +505,25 @@ export async function createInvestment(data: FormData): Promise<ActionResult> {
       currentPrice: String(money.parse(data.get("currentPrice") || 0)),
       expectedYield: String(money.parse(data.get("expectedYield") || 0)),
     });
+  });
+}
+
+export async function updateInvestment(data: FormData): Promise<ActionResult> {
+  return result(data, async (userId) => {
+    const id = z.string().uuid().parse(text(data, "id"));
+    await db
+      .update(investments)
+      .set({
+        name: z.string().min(1).parse(text(data, "name")),
+        type: text(data, "type") || "other",
+        ticker: optional(data, "ticker"),
+        quantity: String(money.parse(data.get("quantity") || 0)),
+        averagePrice: String(money.parse(data.get("averagePrice") || 0)),
+        currentPrice: String(money.parse(data.get("currentPrice") || 0)),
+        expectedYield: String(money.parse(data.get("expectedYield") || 0)),
+        updatedAt: new Date(),
+      })
+      .where(and(eq(investments.id, id), eq(investments.userId, userId), isNull(investments.deletedAt)));
   });
 }
 
@@ -310,6 +558,36 @@ export async function createUberPeriod(data: FormData): Promise<ActionResult> {
       daysWorked: z.coerce.number().int().nonnegative().parse(data.get("daysWorked") || 0),
       ...values,
     });
+  });
+}
+
+export async function updateUberPeriod(data: FormData): Promise<ActionResult> {
+  return result(data, async (userId) => {
+    const id = z.string().uuid().parse(text(data, "id"));
+    const fields = [
+      "grossRevenue",
+      "hoursWorked",
+      "kmDriven",
+      "fuelCost",
+      "tolls",
+      "wash",
+      "maintenance",
+      "otherCosts",
+    ] as const;
+    const values = Object.fromEntries(
+      fields.map((key) => [key, String(money.parse(data.get(key) || 0))]),
+    );
+    await db
+      .update(uberPeriods)
+      .set({
+        source: text(data, "source") || "uber",
+        periodMonth: dateOf(data, "periodMonth"),
+        daysWorked: z.coerce.number().int().nonnegative().parse(data.get("daysWorked") || 0),
+        ...values,
+        notes: optional(data, "notes"),
+        updatedAt: new Date(),
+      })
+      .where(and(eq(uberPeriods.id, id), eq(uberPeriods.userId, userId), isNull(uberPeriods.deletedAt)));
   });
 }
 
@@ -392,12 +670,53 @@ async function findCategoryId(userId: string, name: string) {
   return null;
 }
 
-/** Hub "Novo lançamento": receita (salário/freelance/uber) ou despesa (+ recorrente). */
+/** Hub "Novo lançamento": receita (salário/freelance/uber), despesa (+ recorrente) ou aporte em meta. */
 export async function createLaunch(data: FormData): Promise<ActionResult> {
   return result(
     data,
     async (userId) => {
-    const type = z.enum(["income", "expense"]).parse(text(data, "type"));
+    const type = z.enum(["income", "expense", "goal"]).parse(text(data, "type"));
+
+    if (type === "goal") {
+      // Reusa a mesma lógica de aporte (FormData já traz goalId/amount/date/accountId)
+      const goalId = z.string().uuid("Selecione a meta.").parse(text(data, "goalId"));
+      const amount = money.positive("Informe um valor maior que zero.").parse(data.get("amount"));
+      const paidDate = dateOf(data, "date");
+      const accountId = optional(data, "accountId");
+
+      const [goal] = await db
+        .select()
+        .from(goals)
+        .where(and(eq(goals.id, goalId), eq(goals.userId, userId), isNull(goals.deletedAt)))
+        .limit(1);
+      if (!goal) throw new Error("Meta não encontrada.");
+
+      const categoryId = (await findCategoryId(userId, "Outros")) ?? (await findCategoryId(userId, "Investimentos"));
+      const description = text(data, "description") || `Aporte · ${goal.name}`;
+
+      await db.insert(transactions).values({
+        userId,
+        type: "expense",
+        amount: String(amount),
+        date: paidDate,
+        status: "cleared",
+        description,
+        accountId,
+        categoryId,
+        goalId,
+        notes: optional(data, "notes"),
+      });
+
+      await db
+        .update(goals)
+        .set({
+          currentAmount: String(toNumber(goal.currentAmount) + amount),
+          updatedAt: new Date(),
+        })
+        .where(and(eq(goals.id, goalId), eq(goals.userId, userId)));
+      return;
+    }
+
     const amount = money.positive("Informe um valor maior que zero.").parse(data.get("amount"));
     const date = dateOf(data, "date");
     const accountId = optional(data, "accountId");
@@ -552,7 +871,7 @@ export async function createLaunch(data: FormData): Promise<ActionResult> {
       notes,
     });
   },
-    ["/app/recorrentes", "/app/renda", "/dashboard"],
+    ["/app/recorrentes", "/app/renda", "/app/metas", "/dashboard"],
   );
 }
 
@@ -574,6 +893,26 @@ export async function createRecurringBill(data: FormData): Promise<ActionResult>
       .returning();
     if (!bill) throw new Error("Não foi possível criar a conta recorrente.");
     await ensureOccurrenceForBill(userId, bill);
+  });
+}
+
+export async function updateRecurringBill(data: FormData): Promise<ActionResult> {
+  return result(data, async (userId) => {
+    const id = z.string().uuid().parse(text(data, "id"));
+    const amount = money.positive().parse(data.get("estimatedAmount") ?? data.get("amount"));
+    const dayOfMonth = z.coerce.number().int().min(1).max(31).parse(data.get("dayOfMonth"));
+    await db
+      .update(recurringBills)
+      .set({
+        name: z.string().min(1).parse(text(data, "name")),
+        accountId: optional(data, "accountId"),
+        categoryId: optional(data, "categoryId"),
+        dayOfMonth,
+        estimatedAmount: String(amount),
+        notes: optional(data, "notes"),
+        updatedAt: new Date(),
+      })
+      .where(and(eq(recurringBills.id, id), eq(recurringBills.userId, userId), isNull(recurringBills.deletedAt)));
   });
 }
 

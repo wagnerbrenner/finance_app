@@ -65,6 +65,7 @@ export const transactions = pgTable("transactions", {
   accountId: uuid("account_id"),
   categoryId: uuid("category_id"),
   creditCardId: uuid("credit_card_id"),
+  goalId: uuid("goal_id"),
   type: text("type").notNull(),
   amount: numeric("amount", { precision: 14, scale: 2 }).notNull(),
   description: text("description").notNull().default(""),

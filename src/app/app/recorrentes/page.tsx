@@ -2,14 +2,17 @@ import { and, desc, eq, isNull } from "drizzle-orm";
 import { AppShell } from "@/features/shell/components/app-shell";
 import { PageHeader } from "@/shared/components/page-header";
 import { ConfirmDeleteButton } from "@/shared/components/confirm-delete-button";
+import { EditEntityDialog } from "@/shared/components/edit-entity-dialog";
+import { FormField } from "@/shared/components/form-field";
+import { FormSelect } from "@/shared/components/form-select";
 import {
   ConfirmOccurrenceDialog,
   SkipOccurrenceButton,
 } from "@/features/recurring-bills/components/confirm-occurrence-dialog";
-import { deleteRecurringBill } from "@/features/finance/actions";
+import { deleteRecurringBill, updateRecurringBill } from "@/features/finance/actions";
 import { requireUserId, toNumber } from "@/server/auth";
 import { db } from "@/server/db";
-import { recurringBills } from "@/server/db/schema";
+import { accounts, categories, recurringBills } from "@/server/db/schema";
 import { listPendingOccurrences } from "@/server/services/recurring-bills.service";
 import { formatBRL, formatDate } from "@/shared/lib/formatters";
 import { Badge } from "@/components/ui/badge";
@@ -26,14 +29,73 @@ import {
 export default async function RecurringBillsPage() {
   const userId = await requireUserId();
 
-  const [bills, pending] = await Promise.all([
+  const [bills, pending, accountRows, categoryRows] = await Promise.all([
     db
       .select()
       .from(recurringBills)
       .where(and(eq(recurringBills.userId, userId), isNull(recurringBills.deletedAt)))
       .orderBy(desc(recurringBills.createdAt)),
     listPendingOccurrences(userId),
+    db
+      .select({ id: accounts.id, name: accounts.name })
+      .from(accounts)
+      .where(and(eq(accounts.userId, userId), isNull(accounts.deletedAt))),
+    db
+      .select({ id: categories.id, name: categories.name })
+      .from(categories)
+      .where(and(eq(categories.userId, userId), isNull(categories.deletedAt))),
   ]);
+
+  const accountOptions = accountRows.map((a) => ({ value: a.id, label: a.name }));
+  const categoryOptions = categoryRows.map((c) => ({ value: c.id, label: c.name }));
+
+  const billEditFields = (row: (typeof bills)[number]) => (
+    <>
+      <FormField
+        name="name"
+        label="Nome"
+        required
+        className="sm:col-span-2"
+        defaultValue={row.name}
+      />
+      <FormField
+        name="dayOfMonth"
+        label="Dia do vencimento"
+        type="number"
+        min="1"
+        max="31"
+        required
+        defaultValue={String(row.dayOfMonth)}
+      />
+      <FormField
+        name="estimatedAmount"
+        label="Valor estimado"
+        type="number"
+        min="0.01"
+        step="0.01"
+        required
+        defaultValue={String(toNumber(row.estimatedAmount))}
+      />
+      <FormSelect
+        name="accountId"
+        label="Conta"
+        defaultValue={row.accountId ?? undefined}
+        options={accountOptions}
+      />
+      <FormSelect
+        name="categoryId"
+        label="Categoria"
+        defaultValue={row.categoryId ?? undefined}
+        options={categoryOptions}
+      />
+      <FormField
+        name="notes"
+        label="Observações"
+        className="sm:col-span-2"
+        defaultValue={row.notes ?? undefined}
+      />
+    </>
+  );
 
   return (
     <AppShell title="Recorrentes">
@@ -139,12 +201,22 @@ export default async function RecurringBillsPage() {
                           Todo dia {row.dayOfMonth} · {formatBRL(toNumber(row.estimatedAmount))}
                         </p>
                       </div>
-                      <ConfirmDeleteButton
-                        id={row.id}
-                        path="/app/recorrentes"
-                        action={deleteRecurringBill}
-                        label="recorrente"
-                      />
+                      <div className="inline-flex shrink-0 items-center gap-0.5">
+                        <EditEntityDialog
+                          title="Editar recorrente"
+                          path="/app/recorrentes"
+                          action={updateRecurringBill}
+                          id={row.id}
+                        >
+                          {billEditFields(row)}
+                        </EditEntityDialog>
+                        <ConfirmDeleteButton
+                          id={row.id}
+                          path="/app/recorrentes"
+                          action={deleteRecurringBill}
+                          label="recorrente"
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -167,12 +239,22 @@ export default async function RecurringBillsPage() {
                             {formatBRL(toNumber(row.estimatedAmount))}
                           </TableCell>
                           <TableCell className="text-right">
-                            <ConfirmDeleteButton
-                              id={row.id}
-                              path="/app/recorrentes"
-                              action={deleteRecurringBill}
-                              label="recorrente"
-                            />
+                            <div className="inline-flex items-center justify-end gap-0.5">
+                              <EditEntityDialog
+                                title="Editar recorrente"
+                                path="/app/recorrentes"
+                                action={updateRecurringBill}
+                                id={row.id}
+                              >
+                                {billEditFields(row)}
+                              </EditEntityDialog>
+                              <ConfirmDeleteButton
+                                id={row.id}
+                                path="/app/recorrentes"
+                                action={deleteRecurringBill}
+                                label="recorrente"
+                              />
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}

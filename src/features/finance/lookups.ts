@@ -3,7 +3,7 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { requireUserId } from "@/server/auth";
 import { db } from "@/server/db";
-import { accounts, categories, creditCards } from "@/server/db/schema";
+import { accounts, categories, creditCards, goals } from "@/server/db/schema";
 import { getDueNotifications } from "@/server/services/notifications.service";
 import { getIncomePreferences } from "@/server/services/income-preferences.service";
 
@@ -11,6 +11,7 @@ export type LaunchLookups = {
   accounts: { id: string; name: string }[];
   categories: { id: string; name: string }[];
   cards: { id: string; name: string }[];
+  goals: { id: string; name: string }[];
   hasFreelance: boolean;
   hasUber: boolean;
 };
@@ -19,7 +20,7 @@ export async function getLaunchLookups(): Promise<LaunchLookups> {
   const userId = await requireUserId();
   await db.execute(sql`select public.seed_default_categories(${userId})`);
 
-  const [accountRows, categoryRows, cardRows, prefs] = await Promise.all([
+  const [accountRows, categoryRows, cardRows, goalRows, prefs] = await Promise.all([
     db
       .select({ id: accounts.id, name: accounts.name })
       .from(accounts)
@@ -32,6 +33,10 @@ export async function getLaunchLookups(): Promise<LaunchLookups> {
       .select({ id: creditCards.id, name: creditCards.name })
       .from(creditCards)
       .where(and(eq(creditCards.userId, userId), isNull(creditCards.deletedAt))),
+    db
+      .select({ id: goals.id, name: goals.name })
+      .from(goals)
+      .where(and(eq(goals.userId, userId), isNull(goals.deletedAt))),
     getIncomePreferences(userId),
   ]);
 
@@ -39,6 +44,7 @@ export async function getLaunchLookups(): Promise<LaunchLookups> {
     accounts: accountRows,
     categories: categoryRows,
     cards: cardRows,
+    goals: goalRows,
     hasFreelance: prefs.hasFreelance,
     hasUber: prefs.hasUber,
   };

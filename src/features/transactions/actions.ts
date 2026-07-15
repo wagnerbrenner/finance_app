@@ -1,3 +1,7 @@
 "use server";
 
-export { createTransaction, deleteTransaction } from "@/features/finance/actions";
+export {
+  createTransaction,
+  updateTransaction,
+  deleteTransaction,
+} from "@/features/finance/actions";
