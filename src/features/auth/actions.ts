@@ -5,8 +5,13 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/shared/lib/supabase/server";
+import { createAdminClient, hasServiceRole } from "@/shared/lib/supabase/admin";
 import { getProfileForUser } from "@/server/services/profiles.service";
 import { getSiteUrl } from "@/shared/lib/site-url";
+import {
+  hasResendConfigured,
+  sendSignupConfirmationEmail,
+} from "@/server/services/email.service";
 
 const credentialsSchema = z.object({
   email: z.email("E-mail inválido"),
@@ -37,6 +42,57 @@ function mapAuthError(message: string): string {
     return "Confirme seu e-mail antes de entrar. Use o botão para reenviar o link.";
   }
   return message;
+}
+
+/** Gera link de confirmação e envia pelo Resend (não depende do SMTP do Supabase). */
+async function deliverConfirmationEmail(email: string, password?: string) {
+  if (!hasResendConfigured() || !hasServiceRole()) {
+    return {
+      ok: false as const,
+      error:
+        "E-mail de confirmação ainda não está configurado (RESEND_API_KEY / SUPABASE_SERVICE_ROLE_KEY).",
+    };
+  }
+
+  const origin = getSiteUrl();
+  const admin = createAdminClient();
+
+  const generated = password
+    ? await admin.auth.admin.generateLink({
+        type: "signup",
+        email,
+        password,
+        options: { redirectTo: `${origin}/auth/callback` },
+      })
+    : await admin.auth.admin.generateLink({
+        type: "magiclink",
+        email,
+        options: { redirectTo: `${origin}/auth/callback` },
+      });
+
+  if (generated.error) {
+    return { ok: false as const, error: mapAuthError(generated.error.message) };
+  }
+
+  const link = generated.data.properties?.action_link;
+  if (!link) {
+    return { ok: false as const, error: "Não foi possível gerar o link de confirmação." };
+  }
+
+  const sent = await sendSignupConfirmationEmail(email, link);
+  if (!sent.ok) {
+    const msg = sent.error ?? "Falha ao enviar e-mail pelo Resend.";
+    const lower = msg.toLowerCase();
+    return {
+      ok: false as const,
+      error:
+        lower.includes("domain") || lower.includes("only send") || lower.includes("not allowed")
+          ? "Resend só envia para o e-mail da sua conta enquanto usar onboarding@resend.dev. Verifique um domínio ou teste com o e-mail da conta Resend."
+          : msg,
+    };
+  }
+
+  return { ok: true as const };
 }
 
 export async function signInWithPassword(
@@ -104,6 +160,18 @@ export async function signUp(
   }
 
   if (!data.session) {
+    const delivered = await deliverConfirmationEmail(
+      parsed.data.email,
+      parsed.data.password,
+    );
+    if (!delivered.ok) {
+      return {
+        success: true,
+        needsConfirmation: true,
+        email: parsed.data.email,
+        message: `Conta criada, mas o e-mail falhou: ${delivered.error}`,
+      };
+    }
     return {
       success: true,
       needsConfirmation: true,
@@ -125,6 +193,19 @@ export async function resendConfirmationEmail(
   const parsed = z.email("E-mail inválido").safeParse(email);
   if (!parsed.success) {
     return { error: "Informe um e-mail válido para reenviar a confirmação." };
+  }
+
+  if (hasResendConfigured() && hasServiceRole()) {
+    const delivered = await deliverConfirmationEmail(parsed.data);
+    if (!delivered.ok) {
+      return { error: delivered.error, email: parsed.data, needsConfirmation: true };
+    }
+    return {
+      success: true,
+      needsConfirmation: true,
+      email: parsed.data,
+      message: "E-mail de confirmação reenviado. Verifique sua caixa de entrada.",
+    };
   }
 
   const supabase = await createClient();
