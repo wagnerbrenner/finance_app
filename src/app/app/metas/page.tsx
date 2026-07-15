@@ -16,7 +16,7 @@ export default async function GoalsPage() {
   const userId = await requireUserId();
   const rows = await db.select().from(goals).where(and(eq(goals.userId, userId), isNull(goals.deletedAt))).orderBy(desc(goals.createdAt));
   return <AppShell title="Metas"><div className="space-y-6">
-    <PageHeader title="Metas financeiras" description="Acompanhe o progresso e a contribuição necessária.">
+    <PageHeader title="Metas">
       <CreateEntityDialog title="Nova meta" triggerLabel="Nova meta" path="/app/metas" action={createGoal} successMessage="Meta criada.">
         <FormField name="name" label="Meta" required className="sm:col-span-2" /><FormField name="targetAmount" label="Valor alvo" type="number" min="0.01" step="0.01" required /><FormField name="currentAmount" label="Já acumulado" type="number" min="0" step="0.01" defaultValue="0" required /><FormField name="monthlyContribution" label="Aporte mensal" type="number" min="0" step="0.01" defaultValue="0" required /><FormField name="deadline" label="Prazo" type="date" />
       </CreateEntityDialog>

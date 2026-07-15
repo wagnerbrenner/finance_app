@@ -14,6 +14,7 @@ import {
   CategoryExpenseChart,
   IncomeExpenseChart,
 } from "@/features/dashboard/components/expense-charts";
+import { DueAlertsBanner } from "@/features/notifications/components/due-alerts-banner";
 
 export const metadata: Metadata = {
   title: "Painel · Finance OS",
@@ -21,7 +22,12 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
   const userId = await requireUserId();
-  await db.execute(sql`select public.seed_default_categories(${userId})`);
+  try {
+    await db.execute(sql`select public.seed_default_categories(${userId})`);
+  } catch (err) {
+    console.error("seed_default_categories failed", err);
+  }
+
   const [dashboard, notifications] = await Promise.all([
     getDashboard(userId),
     getDueNotifications(userId),
@@ -29,23 +35,22 @@ export default async function DashboardPage() {
   const { kpis } = dashboard;
   const savingsPct = Math.round(kpis.savingsRate * 100);
 
-  const kpiCards: { label: string; value: number; hint?: string }[] = [
-    { label: "Patrimônio líquido", value: kpis.netWorth },
+  const kpiCards: { label: string; value: number }[] = [
+    { label: "Saldo projetado", value: kpis.projectedYearEndBalance },
     { label: "Saldo em contas", value: kpis.accountBalance },
     { label: "Receitas do mês", value: kpis.month.income },
-    { label: "Despesas do mês", value: -kpis.month.expense },
+    { label: "Despesas do mês", value: kpis.month.expense },
   ];
 
   return (
     <AppShell title="Painel">
       <div className="space-y-5 md:space-y-6">
+        <DueAlertsBanner notifications={notifications} />
+
         <section className="flex flex-wrap items-center gap-2">
           <Badge variant={savingsPct >= 20 ? "default" : savingsPct >= 0 ? "secondary" : "destructive"}>
             Taxa de economia: {savingsPct}%
           </Badge>
-          <span className="text-xs text-muted-foreground">
-            Com base nas receitas e despesas deste mês
-          </span>
         </section>
 
         <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
@@ -56,8 +61,10 @@ export default async function DashboardPage() {
                   {card.label}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-lg font-semibold tracking-tight sm:text-2xl">
-                {formatBRL(card.value)}
+              <CardContent>
+                <p className="text-lg font-semibold tracking-tight sm:text-2xl">
+                  {formatBRL(card.value)}
+                </p>
               </CardContent>
             </Card>
           ))}
@@ -67,7 +74,6 @@ export default async function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Onde foi o dinheiro</CardTitle>
-              <p className="text-sm text-muted-foreground">Despesas por categoria neste mês</p>
             </CardHeader>
             <CardContent>
               <CategoryExpenseChart data={dashboard.expensesByCategory} />
@@ -76,7 +82,6 @@ export default async function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Receitas × despesas</CardTitle>
-              <p className="text-sm text-muted-foreground">Últimos 6 meses</p>
             </CardHeader>
             <CardContent>
               <IncomeExpenseChart data={dashboard.incomeVsExpenseByMonth} />
@@ -87,10 +92,10 @@ export default async function DashboardPage() {
         <section className="grid gap-4 md:gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Fluxo projetado — 30 dias</CardTitle>
+              <CardTitle>Fluxo projetado — 3 meses</CardTitle>
             </CardHeader>
             <CardContent>
-              <CashFlowChart data={dashboard.cashFlow} />
+              <CashFlowChart data={dashboard.cashFlow} meta={dashboard.cashFlowMeta} />
             </CardContent>
           </Card>
           <Card>
@@ -99,9 +104,6 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-semibold">{formatBRL(kpis.nextThirty)}</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Estimativa de recorrências e parcelas nos próximos 30 dias.
-              </p>
               <div className="mt-4 flex flex-wrap gap-2 text-sm">
                 <Link href="/app/recorrentes" className="text-teal-400 underline-offset-2 hover:underline">
                   Recorrentes
@@ -143,49 +145,6 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </section>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Vencimentos</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {notifications.length ? (
-              notifications.map((item) => (
-                <Link
-                  href={item.href}
-                  key={item.id}
-                  className="flex items-center justify-between gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50 active:bg-muted"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-medium">{item.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {item.description} · {item.dueDate}
-                    </p>
-                  </div>
-                  <Badge
-                    variant={
-                      item.severity === "overdue"
-                        ? "destructive"
-                        : item.severity === "due_today"
-                          ? "default"
-                          : "outline"
-                    }
-                  >
-                    {item.severity === "overdue"
-                      ? "Atrasado"
-                      : item.severity === "due_today"
-                        ? "Hoje"
-                        : "Próximo"}
-                  </Badge>
-                </Link>
-              ))
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Nenhum vencimento nos próximos 30 dias.
-              </p>
-            )}
-          </CardContent>
-        </Card>
       </div>
     </AppShell>
   );

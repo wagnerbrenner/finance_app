@@ -171,10 +171,7 @@ export default async function RendaPage() {
     <AppShell title="Renda">
       {!prefs.incomeOnboardingDone ? <IncomeOnboardingDialog open /> : null}
       <div className="space-y-6">
-        <PageHeader
-          title="Renda"
-          description="Salário e outras fontes. Novos lançamentos pelo botão no topo (ou no celular)."
-        />
+        <PageHeader title="Renda" />
         <Tabs defaultValue={defaultTab}>
           <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
             <TabsTrigger value="salary">Salário</TabsTrigger>
@@ -254,7 +251,7 @@ export default async function RendaPage() {
             <TabsContent value="freelance" className="space-y-4 pt-4">
               {periodTable(
                 freelanceRows,
-                "Nenhum período freela. Use Novo lançamento → Receita → Freelance.",
+                "Nenhum período freela. Use Novo lançamento → Receita → Freela.",
               )}
             </TabsContent>
           ) : null}

@@ -38,10 +38,7 @@ export default async function RecurringBillsPage() {
   return (
     <AppShell title="Recorrentes">
       <div className="space-y-5 md:space-y-6">
-        <PageHeader
-          title="Contas recorrentes"
-          description="Confirme o valor real no vencimento. Novas: botão + → Despesa → É recorrente."
-        />
+        <PageHeader title="Contas recorrentes" />
 
         <Card>
           <CardHeader>
@@ -129,7 +126,7 @@ export default async function RecurringBillsPage() {
           <CardContent>
             {bills.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                Nenhuma conta recorrente. Crie pelo botão <strong>+</strong> (Despesa + É recorrente).
+                Nenhuma conta recorrente.
               </p>
             ) : (
               <>

@@ -57,12 +57,30 @@ export async function ensureOccurrenceForBill(
       expectedAmount: bill.estimatedAmount,
       status,
     })
+    .onConflictDoNothing({
+      target: [recurringBillOccurrences.billId, recurringBillOccurrences.dueDate],
+    })
     .returning({ id: recurringBillOccurrences.id });
 
-  return row.id;
+  if (row?.id) return row.id;
+
+  const again = await db
+    .select({ id: recurringBillOccurrences.id })
+    .from(recurringBillOccurrences)
+    .where(
+      and(
+        eq(recurringBillOccurrences.billId, bill.id),
+        eq(recurringBillOccurrences.dueDate, target),
+        isNull(recurringBillOccurrences.deletedAt),
+      ),
+    )
+    .limit(1);
+
+  if (!again[0]) throw new Error("Não foi possível criar ocorrência da conta recorrente.");
+  return again[0].id;
 }
 
-/** Ensure every active bill has a pending occurrence for the current/next cycle. */
+/** Ensure every active bill has a pending occurrence for the current/next cycle (batched). */
 export async function ensureUpcomingOccurrences(userId: string) {
   const bills = await db
     .select()
@@ -71,24 +89,82 @@ export async function ensureUpcomingOccurrences(userId: string) {
       and(eq(recurringBills.userId, userId), eq(recurringBills.isActive, true), isNull(recurringBills.deletedAt)),
     );
 
-  for (const bill of bills) {
-    await ensureOccurrenceForBill(userId, bill);
-    // Also seed following month if current occurrence is already due/paid window
-    const following = nextDueDate(bill.dayOfMonth, addMonths(new Date(), 1));
-    const open = await db
-      .select({ id: recurringBillOccurrences.id, status: recurringBillOccurrences.status })
-      .from(recurringBillOccurrences)
-      .where(
-        and(
-          eq(recurringBillOccurrences.billId, bill.id),
-          inArray(recurringBillOccurrences.status, ["scheduled", "due"]),
-          isNull(recurringBillOccurrences.deletedAt),
-        ),
-      )
-      .limit(1);
-    if (!open[0]) {
-      await ensureOccurrenceForBill(userId, bill, following);
+  if (bills.length === 0) return;
+
+  const today = format(new Date(), "yyyy-MM-dd");
+  const targets = bills.map((bill) => ({
+    bill,
+    dueDate: nextDueDate(bill.dayOfMonth),
+    following: nextDueDate(bill.dayOfMonth, addMonths(new Date(), 1)),
+  }));
+
+  const billIds = bills.map((b) => b.id);
+  const existing = await db
+    .select({
+      id: recurringBillOccurrences.id,
+      billId: recurringBillOccurrences.billId,
+      dueDate: recurringBillOccurrences.dueDate,
+      status: recurringBillOccurrences.status,
+    })
+    .from(recurringBillOccurrences)
+    .where(
+      and(
+        eq(recurringBillOccurrences.userId, userId),
+        inArray(recurringBillOccurrences.billId, billIds),
+        isNull(recurringBillOccurrences.deletedAt),
+      ),
+    );
+
+  const byBillDue = new Set(existing.map((e) => `${e.billId}:${e.dueDate}`));
+  const openByBill = new Set(
+    existing.filter((e) => e.status === "scheduled" || e.status === "due").map((e) => e.billId),
+  );
+
+  const toInsert: {
+    userId: string;
+    billId: string;
+    dueDate: string;
+    expectedAmount: string;
+    status: string;
+  }[] = [];
+
+  for (const item of targets) {
+    const key = `${item.bill.id}:${item.dueDate}`;
+    if (!byBillDue.has(key)) {
+      toInsert.push({
+        userId,
+        billId: item.bill.id,
+        dueDate: item.dueDate,
+        expectedAmount: item.bill.estimatedAmount,
+        status: item.dueDate <= today ? "due" : "scheduled",
+      });
+      byBillDue.add(key);
+      openByBill.add(item.bill.id);
     }
+
+    if (!openByBill.has(item.bill.id)) {
+      const followKey = `${item.bill.id}:${item.following}`;
+      if (!byBillDue.has(followKey)) {
+        toInsert.push({
+          userId,
+          billId: item.bill.id,
+          dueDate: item.following,
+          expectedAmount: item.bill.estimatedAmount,
+          status: item.following <= today ? "due" : "scheduled",
+        });
+        byBillDue.add(followKey);
+        openByBill.add(item.bill.id);
+      }
+    }
+  }
+
+  if (toInsert.length > 0) {
+    await db
+      .insert(recurringBillOccurrences)
+      .values(toInsert)
+      .onConflictDoNothing({
+        target: [recurringBillOccurrences.billId, recurringBillOccurrences.dueDate],
+      });
   }
 }
 

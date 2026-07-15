@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/shared/lib/supabase/server";
 import { getProfileForUser } from "@/server/services/profiles.service";
+import { getSiteUrl } from "@/shared/lib/site-url";
 
 const credentialsSchema = z.object({
   email: z.email("E-mail inválido"),
@@ -20,15 +21,20 @@ export type AuthActionState = {
   error?: string;
   success?: boolean;
   message?: string;
+  needsConfirmation?: boolean;
+  email?: string;
 };
 
 function mapAuthError(message: string): string {
   const lower = message.toLowerCase();
-  if (lower.includes("rate limit")) {
-    return "Limite de e-mails do Supabase atingido (plano free: ~2/hora). Desative Confirm email no dashboard ou aguarde 1 hora.";
+  if (lower.includes("rate limit") || lower.includes("email rate")) {
+    return "Limite de e-mails atingido. Aguarde alguns minutos e tente reenviar a confirmação.";
   }
   if (lower.includes("already registered") || lower.includes("user already")) {
     return "Este e-mail já está cadastrado. Faça login.";
+  }
+  if (lower.includes("email not confirmed") || lower.includes("not confirmed")) {
+    return "Confirme seu e-mail antes de entrar. Use o botão para reenviar o link.";
   }
   return message;
 }
@@ -50,6 +56,14 @@ export async function signInWithPassword(
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
+    const lower = error.message.toLowerCase();
+    if (lower.includes("email not confirmed") || lower.includes("not confirmed")) {
+      return {
+        error: "Confirme seu e-mail antes de entrar.",
+        needsConfirmation: true,
+        email: parsed.data.email,
+      };
+    }
     return { error: "E-mail ou senha incorretos." };
   }
 
@@ -72,7 +86,7 @@ export async function signUp(
   }
 
   const supabase = await createClient();
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const origin = getSiteUrl();
 
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
@@ -89,17 +103,50 @@ export async function signUp(
     return { error: mapAuthError(error.message) };
   }
 
-  // Confirm email ligado: não há sessão até o usuário confirmar.
   if (!data.session) {
     return {
       success: true,
+      needsConfirmation: true,
+      email: parsed.data.email,
       message:
-        "Conta criada. Verifique seu e-mail para confirmar e depois faça login.",
+        "Conta criada. Enviamos um e-mail de confirmação. Abra o link e depois faça login.",
     };
   }
 
   revalidatePath("/", "layout");
   redirect("/dashboard");
+}
+
+export async function resendConfirmationEmail(
+  _prev: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const email = String(formData.get("email") ?? "").trim();
+  const parsed = z.email("E-mail inválido").safeParse(email);
+  if (!parsed.success) {
+    return { error: "Informe um e-mail válido para reenviar a confirmação." };
+  }
+
+  const supabase = await createClient();
+  const origin = getSiteUrl();
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email: parsed.data,
+    options: {
+      emailRedirectTo: `${origin}/auth/callback`,
+    },
+  });
+
+  if (error) {
+    return { error: mapAuthError(error.message), email: parsed.data, needsConfirmation: true };
+  }
+
+  return {
+    success: true,
+    needsConfirmation: true,
+    email: parsed.data,
+    message: "E-mail de confirmação reenviado. Verifique sua caixa de entrada.",
+  };
 }
 
 export async function signOut(): Promise<void> {

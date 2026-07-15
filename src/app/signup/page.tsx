@@ -3,7 +3,6 @@ import Link from "next/link";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -42,7 +41,6 @@ export default function SignupPage() {
         <Card className="border-border/70 bg-card/80 backdrop-blur">
           <CardHeader>
             <CardTitle>Criar conta</CardTitle>
-            <CardDescription>Uso pessoal, arquitetura SaaS.</CardDescription>
           </CardHeader>
           <CardContent>
             <SignupForm />

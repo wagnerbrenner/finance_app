@@ -19,7 +19,7 @@ export default async function DebtsPage() {
   const userId = await requireUserId();
   const rows = await db.select().from(debts).where(and(eq(debts.userId, userId), isNull(debts.deletedAt))).orderBy(desc(debts.createdAt));
   return <AppShell title="Dívidas"><div className="space-y-6">
-    <PageHeader title="Dívidas" description="Registre saldos, prioridades e simule amortizações.">
+    <PageHeader title="Dívidas">
       <CreateEntityDialog title="Nova dívida" triggerLabel="Nova dívida" path="/app/dividas" action={createDebt} successMessage="Dívida criada.">
         <FormField name="name" label="Dívida" required className="sm:col-span-2" />
         <FormField name="creditor" label="Credor" />

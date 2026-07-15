@@ -16,6 +16,7 @@ import { requireUserId, toNumber } from "@/server/auth";
 import { db } from "@/server/db";
 import { accounts, creditCards, installments, recurrences } from "@/server/db/schema";
 import { formatBRL, formatDate } from "@/shared/lib/formatters";
+import { FREQUENCY_LABELS, labelOf } from "@/shared/lib/labels";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -70,7 +71,7 @@ export default async function CardsPage() {
   return (
     <AppShell title="Cartões">
       <div className="space-y-6">
-        <PageHeader title="Cartões" description="Limites, compras parceladas e recorrências fixas.">
+        <PageHeader title="Cartões">
           <CreateEntityDialog
             title="Novo cartão"
             triggerLabel="Novo cartão"
@@ -224,10 +225,6 @@ export default async function CardsPage() {
             </Card>
           </TabsContent>
           <TabsContent value="recurrences" className="space-y-4 pt-4">
-            <p className="text-sm text-muted-foreground">
-              Contas variáveis (luz, água): use <strong>Novo lançamento</strong> → Despesa → É recorrente.
-              Aqui ficam só as recorrências fixas já cadastradas.
-            </p>
             <Card>
               <CardContent className="pt-6">
                 {recurring.length ? (
@@ -250,7 +247,7 @@ export default async function CardsPage() {
                               {item.type === "income" ? "Receita" : "Despesa"}
                             </Badge>
                           </TableCell>
-                          <TableCell>{item.frequency}</TableCell>
+                          <TableCell>{labelOf(FREQUENCY_LABELS, item.frequency)}</TableCell>
                           <TableCell>Dia {item.dayOfMonth ?? 1}</TableCell>
                           <TableCell className="text-right">
                             {formatBRL(toNumber(item.amount))}

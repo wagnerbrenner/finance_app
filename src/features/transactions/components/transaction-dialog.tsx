@@ -11,6 +11,7 @@ import { FormSelect } from "@/shared/components/form-select";
 import { LaunchDialog } from "@/shared/components/launch-dialog";
 import { Label } from "@/components/ui/label";
 import { useUiStore } from "@/shared/stores/ui-store";
+import { localDateISO } from "@/shared/lib/formatters";
 
 type Props = {
   /** Se true, usa o estado global do shell (FAB / topbar). */
@@ -57,16 +58,17 @@ export function TransactionDialog({
     });
   }, [isOpen]);
 
-  useEffect(() => {
-    if (!lookups) return;
-    if (incomeOrigin === "freelance" && !lookups.hasFreelance) setIncomeOrigin("salary");
-    if (incomeOrigin === "uber" && !lookups.hasUber) setIncomeOrigin("salary");
-  }, [lookups, incomeOrigin]);
+  const resolvedIncomeOrigin =
+    incomeOrigin === "freelance" && lookups && !lookups.hasFreelance
+      ? "salary"
+      : incomeOrigin === "uber" && lookups && !lookups.hasUber
+        ? "salary"
+        : incomeOrigin;
 
   async function submit(data: FormData) {
     data.set("path", "/app/transacoes");
     data.set("type", type);
-    if (type === "income") data.set("incomeOrigin", incomeOrigin);
+    if (type === "income") data.set("incomeOrigin", resolvedIncomeOrigin);
     if (type === "expense") data.set("isRecurring", isRecurring ? "true" : "false");
     if (await actionToast(() => createLaunch(data), "Lançamento registrado.")) {
       setOpen(false);
@@ -79,7 +81,7 @@ export function TransactionDialog({
   const accounts = lookups?.accounts ?? accountsProp ?? [];
   const categories = lookups?.categories ?? categoriesProp ?? [];
   const cards = lookups?.cards ?? cardsProp ?? [];
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateISO();
   const monthStart = `${today.slice(0, 8)}01`;
 
   const showTrigger = !global && openProp === undefined;
@@ -88,7 +90,6 @@ export function TransactionDialog({
   return (
     <LaunchDialog
       title="Novo lançamento"
-      description="Receita, despesa ou conta recorrente."
       open={isOpen}
       onOpenChange={setOpen}
       trigger={showTrigger ? triggerLabel : undefined}
@@ -112,14 +113,14 @@ export function TransactionDialog({
               name="incomeOriginUi"
               label="Origem da receita"
               required
-              value={incomeOrigin}
+              value={resolvedIncomeOrigin}
               onChange={(e) =>
                 setIncomeOrigin(e.target.value as "salary" | "freelance" | "uber")
               }
               options={[
                 { value: "salary", label: "Salário" },
                 ...(lookups?.hasFreelance
-                  ? [{ value: "freelance", label: "Freelance" }]
+                  ? [{ value: "freelance", label: "Freela" }]
                   : []),
                 ...(lookups?.hasUber ? [{ value: "uber", label: "Uber" }] : []),
               ]}
@@ -155,26 +156,26 @@ export function TransactionDialog({
             required={type === "expense"}
             placeholder={
               type === "income"
-                ? incomeOrigin === "salary"
+                ? resolvedIncomeOrigin === "salary"
                   ? "Salário"
-                  : incomeOrigin === "freelance"
-                    ? "Receita freelance"
+                  : resolvedIncomeOrigin === "freelance"
+                    ? "Receita freela"
                     : "Receita Uber"
                 : "Ex.: Conta de luz"
             }
             defaultValue={
               type === "income"
-                ? incomeOrigin === "salary"
+                ? resolvedIncomeOrigin === "salary"
                   ? "Salário"
-                  : incomeOrigin === "freelance"
-                    ? "Receita freelance"
+                  : resolvedIncomeOrigin === "freelance"
+                    ? "Receita freela"
                     : "Receita Uber"
                 : undefined
             }
-            key={`${type}-${incomeOrigin}`}
+            key={`${type}-${resolvedIncomeOrigin}`}
           />
 
-          {type === "income" && incomeOrigin === "salary" ? (
+          {type === "income" && resolvedIncomeOrigin === "salary" ? (
             <>
               <FormSelect
                 name="status"
@@ -200,7 +201,7 @@ export function TransactionDialog({
             </>
           ) : null}
 
-          {type === "income" && incomeOrigin === "freelance" ? (
+          {type === "income" && resolvedIncomeOrigin === "freelance" ? (
             <>
               <FormField
                 name="periodMonth"
@@ -254,7 +255,7 @@ export function TransactionDialog({
             </>
           ) : null}
 
-          {type === "income" && incomeOrigin === "uber" ? (
+          {type === "income" && resolvedIncomeOrigin === "uber" ? (
             <>
               <FormField
                 name="periodMonth"

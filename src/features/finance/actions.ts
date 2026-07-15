@@ -27,6 +27,7 @@ import {
   nextDueDate,
 } from "@/server/services/recurring-bills.service";
 import { format, startOfMonth } from "date-fns";
+import { localDateISO, parseDateInput } from "@/shared/lib/formatters";
 
 export type { ActionResult } from "@/features/finance/types";
 
@@ -34,6 +35,8 @@ const money = z.coerce.number().nonnegative();
 const text = (data: FormData, name: string) => String(data.get(name) ?? "").trim();
 const optional = (data: FormData, name: string) => text(data, name) || null;
 const pathOf = (data: FormData) => text(data, "path") || "/dashboard";
+const dateOf = (data: FormData, name: string, fallback?: string) =>
+  parseDateInput(text(data, name), fallback ?? localDateISO());
 
 function errorMessage(error: unknown) {
   if (error instanceof ZodError) return error.issues[0]?.message ?? "Revise os dados informados.";
@@ -110,7 +113,7 @@ export async function createTransaction(data: FormData): Promise<ActionResult> {
       .parse({
         description: text(data, "description"),
         amount: data.get("amount"),
-        date: text(data, "date"),
+        date: dateOf(data, "date"),
         type: text(data, "type"),
         status: text(data, "status") || "cleared",
       });
@@ -118,6 +121,7 @@ export async function createTransaction(data: FormData): Promise<ActionResult> {
       userId,
       ...parsed,
       amount: String(parsed.amount),
+      date: parsed.date,
       accountId: optional(data, "accountId"),
       categoryId: optional(data, "categoryId"),
       creditCardId: optional(data, "creditCardId"),
@@ -171,7 +175,7 @@ export async function createInstallment(data: FormData): Promise<ActionResult> {
       totalAmount: String(total),
       installmentAmount: String(total / count),
       totalInstallments: count,
-      startDate: text(data, "startDate"),
+      startDate: dateOf(data, "startDate"),
     });
   });
 }
@@ -195,7 +199,7 @@ export async function createRecurrence(data: FormData): Promise<ActionResult> {
       description: z.string().min(1).parse(text(data, "description")),
       frequency: text(data, "frequency") || "monthly",
       dayOfMonth: z.coerce.number().min(1).max(31).parse(data.get("dayOfMonth")),
-      startDate: text(data, "startDate"),
+      startDate: dateOf(data, "startDate"),
       accountId: optional(data, "accountId"),
     });
   });
@@ -221,7 +225,7 @@ export async function createDebt(data: FormData): Promise<ActionResult> {
       interestRate: String(money.parse(data.get("interestRate") || 0)),
       installmentAmount: optional(data, "installmentAmount"),
       creditor: optional(data, "creditor"),
-      dueDate: optional(data, "dueDate"),
+      dueDate: optional(data, "dueDate") ? dateOf(data, "dueDate") : null,
       type: text(data, "type") || "other",
       priority: text(data, "priority") || "medium",
     });
@@ -245,7 +249,7 @@ export async function createGoal(data: FormData): Promise<ActionResult> {
       targetAmount: String(money.positive().parse(data.get("targetAmount"))),
       currentAmount: String(money.parse(data.get("currentAmount") || 0)),
       monthlyContribution: String(money.parse(data.get("monthlyContribution") || 0)),
-      deadline: optional(data, "deadline"),
+      deadline: optional(data, "deadline") ? dateOf(data, "deadline") : null,
       type: text(data, "type") || "other",
     });
   });
@@ -302,7 +306,7 @@ export async function createUberPeriod(data: FormData): Promise<ActionResult> {
     await db.insert(uberPeriods).values({
       userId,
       source: text(data, "source") || "uber",
-      periodMonth: text(data, "periodMonth"),
+      periodMonth: dateOf(data, "periodMonth"),
       daysWorked: z.coerce.number().int().nonnegative().parse(data.get("daysWorked") || 0),
       ...values,
     });
@@ -341,7 +345,7 @@ const consortiumInput = (data: FormData) => {
     administrator: optional(data, "administrator"),
     groupNumber: optional(data, "groupNumber"),
     letterNumber: optional(data, "letterNumber"),
-    nextDueDate: optional(data, "nextDueDate"),
+    nextDueDate: optional(data, "nextDueDate") ? dateOf(data, "nextDueDate") : null,
     contemplated: text(data, "contemplated") === "true",
     contemplatedAt: optional(data, "contemplatedAt"),
     status: text(data, "status") || "active",
@@ -375,12 +379,17 @@ export async function deleteConsortium(data: FormData): Promise<ActionResult> {
 }
 
 async function findCategoryId(userId: string, name: string) {
-  const [row] = await db
-    .select({ id: categories.id })
-    .from(categories)
-    .where(and(eq(categories.userId, userId), eq(categories.name, name), isNull(categories.deletedAt)))
-    .limit(1);
-  return row?.id ?? null;
+  const aliases =
+    name === "Freela" || name === "Freelance" ? ["Freela", "Freelance"] : [name];
+  for (const alias of aliases) {
+    const [row] = await db
+      .select({ id: categories.id })
+      .from(categories)
+      .where(and(eq(categories.userId, userId), eq(categories.name, alias), isNull(categories.deletedAt)))
+      .limit(1);
+    if (row?.id) return row.id;
+  }
+  return null;
 }
 
 /** Hub "Novo lançamento": receita (salário/freelance/uber) ou despesa (+ recorrente). */
@@ -390,7 +399,7 @@ export async function createLaunch(data: FormData): Promise<ActionResult> {
     async (userId) => {
     const type = z.enum(["income", "expense"]).parse(text(data, "type"));
     const amount = money.positive("Informe um valor maior que zero.").parse(data.get("amount"));
-    const date = z.string().min(1).parse(text(data, "date"));
+    const date = dateOf(data, "date");
     const accountId = optional(data, "accountId");
     const notes = optional(data, "notes");
 
@@ -400,29 +409,77 @@ export async function createLaunch(data: FormData): Promise<ActionResult> {
 
       if (origin === "salary") {
         const categoryId = optional(data, "categoryId") ?? (await findCategoryId(userId, "Salário"));
+        const description = text(data, "description") || "Salário";
+        const dayOfMonth = Math.min(Math.max(new Date(`${date}T12:00:00`).getDate(), 1), 28);
+
         await db.insert(transactions).values({
           userId,
           type: "income",
           amount: String(amount),
           date,
           status,
-          description: text(data, "description") || "Salário",
+          description,
           accountId,
           categoryId,
           notes,
         });
+
+        // Mantém recorrência mensal de salário para o gráfico/painel dos próximos meses
+        const [existing] = await db
+          .select({ id: recurrences.id })
+          .from(recurrences)
+          .where(
+            and(
+              eq(recurrences.userId, userId),
+              eq(recurrences.type, "income"),
+              eq(recurrences.isActive, true),
+              isNull(recurrences.deletedAt),
+              eq(recurrences.description, "Salário"),
+            ),
+          )
+          .limit(1);
+
+        if (existing) {
+          await db
+            .update(recurrences)
+            .set({
+              amount: String(amount),
+              dayOfMonth,
+              accountId,
+              categoryId,
+              frequency: "monthly",
+              updatedAt: new Date(),
+            })
+            .where(and(eq(recurrences.id, existing.id), eq(recurrences.userId, userId)));
+        } else {
+          await db.insert(recurrences).values({
+            userId,
+            type: "income",
+            amount: String(amount),
+            description: "Salário",
+            frequency: "monthly",
+            dayOfMonth,
+            startDate: date,
+            accountId,
+            categoryId,
+          });
+        }
         return;
       }
 
       const source = origin === "freelance" ? "freelance" : "uber";
-      const periodMonth = text(data, "periodMonth") || format(startOfMonth(new Date(date)), "yyyy-MM-dd");
+      const periodMonth = dateOf(
+        data,
+        "periodMonth",
+        format(startOfMonth(new Date(`${date}T12:00:00`)), "yyyy-MM-dd"),
+      );
       const hoursWorked = money.parse(data.get("hoursWorked") || 0);
       const taxesOrFuel = money.parse(data.get(origin === "freelance" ? "taxes" : "fuelCost") || 0);
       const kmDriven = money.parse(data.get("kmDriven") || 0);
-      const categoryName = origin === "freelance" ? "Freelance" : "Uber / Apps";
+      const categoryName = origin === "freelance" ? "Freela" : "Uber / Apps";
       const categoryId = optional(data, "categoryId") ?? (await findCategoryId(userId, categoryName));
       const description =
-        text(data, "description") || (origin === "freelance" ? "Receita freelance" : "Receita Uber");
+        text(data, "description") || (origin === "freelance" ? "Receita freela" : "Receita Uber");
 
       await db.insert(uberPeriods).values({
         userId,
@@ -477,6 +534,7 @@ export async function createLaunch(data: FormData): Promise<ActionResult> {
           notes,
         })
         .returning();
+      if (!bill) throw new Error("Não foi possível criar a conta recorrente.");
       await ensureOccurrenceForBill(userId, bill);
       return;
     }
@@ -514,6 +572,7 @@ export async function createRecurringBill(data: FormData): Promise<ActionResult>
         notes: optional(data, "notes"),
       })
       .returning();
+    if (!bill) throw new Error("Não foi possível criar a conta recorrente.");
     await ensureOccurrenceForBill(userId, bill);
   });
 }
@@ -533,7 +592,7 @@ export async function confirmRecurringOccurrence(data: FormData): Promise<Action
   return result(data, async (userId) => {
     const occurrenceId = z.string().uuid().parse(text(data, "id"));
     const actualAmount = money.positive().parse(data.get("actualAmount"));
-    const paidDate = text(data, "date") || format(new Date(), "yyyy-MM-dd");
+    const paidDate = dateOf(data, "date");
 
     const [occurrence] = await db
       .select({
@@ -573,6 +632,8 @@ export async function confirmRecurringOccurrence(data: FormData): Promise<Action
         notes: optional(data, "notes"),
       })
       .returning({ id: transactions.id });
+
+    if (!tx) throw new Error("Não foi possível registrar o pagamento.");
 
     await db
       .update(recurringBillOccurrences)

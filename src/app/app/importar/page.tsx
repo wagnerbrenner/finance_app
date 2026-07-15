@@ -17,10 +17,7 @@ export default async function ImportPage() {
   return (
     <AppShell title="Importar">
       <div className="space-y-6">
-        <PageHeader
-          title="Importar extrato"
-          description="CSV/OFX do banco (Nubank e similares). Sem sync automático — veja a documentação de integrações."
-        />
+        <PageHeader title="Importar extrato" />
         <Card>
           <CardHeader>
             <CardTitle>Upload</CardTitle>

@@ -39,18 +39,12 @@ export default async function TransactionsPage() {
   return (
     <AppShell title="Transações">
       <div className="space-y-6">
-        <PageHeader
-          title="Lançamentos"
-          description="Consulte e exclua receitas e despesas. Novos lançamentos pelo botão + (celular) ou Novo lançamento (desktop)."
-        />
+        <PageHeader title="Lançamentos" />
 
         <Card>
           <CardContent className="pt-6">
             {rows.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Nenhum lançamento ainda. Use o botão <strong>+</strong> no celular ou{" "}
-                <strong>Novo lançamento</strong> no computador.
-              </p>
+              <p className="text-sm text-muted-foreground">Nenhum lançamento ainda.</p>
             ) : (
               <>
                 <div className="space-y-3 md:hidden">

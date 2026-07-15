@@ -1,11 +1,18 @@
-import { addDays, addMonths, format, getDaysInMonth } from "date-fns";
+import { addDays, differenceInCalendarDays, endOfYear, format, getDaysInMonth, startOfDay } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/server/db";
 import { installments, recurrences } from "@/server/db/schema";
 import { toNumber } from "@/server/auth";
 
 export type ProjectionPoint = { label: string; date: string; balance: number };
-export type CashFlowPoint = { label: string; date: string; balance: number };
+export type CashFlowPoint = {
+  label: string;
+  date: string;
+  balance: number;
+  income: number;
+  expense: number;
+};
 
 type RecurrenceRow = {
   frequency: string;
@@ -37,7 +44,6 @@ function recurrenceOccursOn(recurrence: RecurrenceRow, date: Date) {
   if (recurrence.frequency === "yearly") {
     return date.getMonth() === start.getMonth() && date.getDate() === Math.min(day, dim);
   }
-  // monthly (default)
   return date.getDate() === Math.min(day, dim);
 }
 
@@ -55,7 +61,7 @@ async function loadProjectionInputs(userId: string) {
   return { activeRecurrences, activeInstallments };
 }
 
-function projectDays(
+function projectDaysDetailed(
   openingBalance: number,
   days: number,
   activeRecurrences: RecurrenceRow[],
@@ -67,10 +73,19 @@ function projectDays(
   for (let index = 0; index < days; index += 1) {
     const date = addDays(new Date(), index + 1);
     const iso = format(date, "yyyy-MM-dd");
+    let income = 0;
+    let expense = 0;
 
     for (const item of activeRecurrences) {
       if (recurrenceOccursOn(item, date)) {
-        balance += item.type === "income" ? toNumber(item.amount) : -toNumber(item.amount);
+        const amount = toNumber(item.amount);
+        if (item.type === "income") {
+          income += amount;
+          balance += amount;
+        } else {
+          expense += amount;
+          balance -= amount;
+        }
       }
     }
 
@@ -83,47 +98,128 @@ function projectDays(
         months >= item.paidInstallments &&
         months < item.totalInstallments
       ) {
-        balance -= toNumber(item.installmentAmount);
+        const amount = toNumber(item.installmentAmount);
+        expense += amount;
+        balance -= amount;
       }
     }
 
-    points.push({ label: format(date, "dd/MM"), date: iso, balance });
+    points.push({
+      label: format(date, "dd/MM", { locale: ptBR }),
+      date: iso,
+      balance,
+      income,
+      expense,
+    });
   }
 
   return points;
 }
 
-export async function getCashFlow(userId: string, openingBalance: number, days = 30) {
-  const { activeRecurrences, activeInstallments } = await loadProjectionInputs(userId);
-  return projectDays(openingBalance, days, activeRecurrences, activeInstallments);
+/** Agrega dias em semanas para o gráfico de 3 meses ficar legível. */
+export function aggregateCashFlowWeekly(daily: CashFlowPoint[]): CashFlowPoint[] {
+  if (daily.length === 0) return [];
+  const weeks: CashFlowPoint[] = [];
+  for (let i = 0; i < daily.length; i += 7) {
+    const chunk = daily.slice(i, i + 7);
+    const last = chunk.at(-1)!;
+    weeks.push({
+      label: format(new Date(`${last.date}T12:00:00`), "dd MMM", { locale: ptBR }).replace(".", ""),
+      date: last.date,
+      balance: last.balance,
+      income: chunk.reduce((s, p) => s + p.income, 0),
+      expense: chunk.reduce((s, p) => s + p.expense, 0),
+    });
+  }
+  return weeks;
 }
 
-/** Single pass: 30-day chart + horizon snapshots without recomputing 5 years twice. */
+/** Dias restantes até 31/12 do ano corrente (inclusive). */
+export function daysUntilYearEnd(from = new Date()) {
+  const end = startOfDay(endOfYear(from));
+  const today = startOfDay(from);
+  return Math.max(0, differenceInCalendarDays(end, today));
+}
+
+const THREE_MONTHS_DAYS = 90;
+
+export async function getCashFlow(userId: string, openingBalance: number, days = THREE_MONTHS_DAYS) {
+  const { activeRecurrences, activeInstallments } = await loadProjectionInputs(userId);
+  const capped = Math.min(days, daysUntilYearEnd() || 1);
+  return projectDaysDetailed(openingBalance, capped, activeRecurrences, activeInstallments);
+}
+
+/** Fluxo dos próximos ~3 meses (semanal) + snapshots até o fim do ano. */
 export async function getCashFlowAndProjections(userId: string, openingBalance: number) {
   const { activeRecurrences, activeInstallments } = await loadProjectionInputs(userId);
-  const horizonDays = 365 * 5 + 1;
-  const full = projectDays(openingBalance, horizonDays, activeRecurrences, activeInstallments);
-  const cashFlow = full.slice(0, 30);
+  const now = new Date();
+  const horizonDays = daysUntilYearEnd(now);
+  const full =
+    horizonDays > 0
+      ? projectDaysDetailed(openingBalance, horizonDays, activeRecurrences, activeInstallments)
+      : [
+          {
+            label: format(now, "dd/MM", { locale: ptBR }),
+            date: format(now, "yyyy-MM-dd"),
+            balance: openingBalance,
+            income: 0,
+            expense: 0,
+          },
+        ];
 
-  const horizons = [
-    ["30 dias", addDays(new Date(), 30)],
-    ["90 dias", addDays(new Date(), 90)],
-    ["6 meses", addMonths(new Date(), 6)],
-    ["1 ano", addMonths(new Date(), 12)],
-    ["5 anos", addMonths(new Date(), 60)],
-  ] as const;
+  const threeMonthDays = Math.min(THREE_MONTHS_DAYS, full.length);
+  const cashFlowDaily = full.slice(0, threeMonthDays);
+  const cashFlow = aggregateCashFlowWeekly(cashFlowDaily);
+
+  const yearEnd = format(endOfYear(now), "yyyy-MM-dd");
+  const threeMonthsDate = addDays(now, threeMonthDays);
+  const candidates: [string, Date][] = [
+    ["Daqui a 1 mês", addDays(now, 30)],
+    ["Daqui a 2 meses", addDays(now, 60)],
+    ["Daqui a 3 meses", threeMonthsDate],
+    ["Fim do ano", endOfYear(now)],
+  ];
 
   const byDate = new Map(full.map((p) => [p.date, p.balance]));
-  const projections: ProjectionPoint[] = horizons.map(([label, date]) => {
+  const seen = new Set<string>();
+  const projections: ProjectionPoint[] = [];
+
+  for (const [label, date] of candidates) {
     const target = format(date, "yyyy-MM-dd");
-    return {
+    if (target > yearEnd) continue;
+    if (target <= format(now, "yyyy-MM-dd")) continue;
+    if (seen.has(target)) continue;
+    seen.add(target);
+    projections.push({
       label,
       date: target,
       balance: byDate.get(target) ?? full.at(-1)?.balance ?? openingBalance,
-    };
-  });
+    });
+  }
 
-  return { cashFlow, projections };
+  if (!projections.some((p) => p.date === yearEnd)) {
+    projections.push({
+      label: "Fim do ano",
+      date: yearEnd,
+      balance: byDate.get(yearEnd) ?? full.at(-1)?.balance ?? openingBalance,
+    });
+  }
+
+  const periodIncome = cashFlowDaily.reduce((s, p) => s + p.income, 0);
+  const periodExpense = cashFlowDaily.reduce((s, p) => s + p.expense, 0);
+
+  return {
+    cashFlow,
+    projections,
+    projectedYearEndBalance: byDate.get(yearEnd) ?? full.at(-1)?.balance ?? openingBalance,
+    cashFlowMeta: {
+      days: threeMonthDays,
+      openingBalance,
+      closingBalance: cashFlowDaily.at(-1)?.balance ?? openingBalance,
+      periodIncome,
+      periodExpense,
+    },
+  };
 }
 
 export async function getProjections(userId: string, openingBalance: number): Promise<ProjectionPoint[]> {

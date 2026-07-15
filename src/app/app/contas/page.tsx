@@ -11,6 +11,7 @@ import { db } from "@/server/db";
 import { accounts } from "@/server/db/schema";
 import { getAccountBalances } from "@/server/services/recurring-bills.service";
 import { formatBRL } from "@/shared/lib/formatters";
+import { ACCOUNT_TYPE_LABELS } from "@/shared/lib/labels";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -37,21 +38,14 @@ export default async function AccountsPage() {
 
   const balanceByAccount = new Map(balances.map((b) => [b.id, b.balance]));
 
-  const typeLabel: Record<string, string> = {
-    checking: "Conta corrente",
-    savings: "Poupança",
-    cash: "Dinheiro",
-    investment: "Investimento",
-    other: "Outra",
-  };
+  const typeLabel = ACCOUNT_TYPE_LABELS;
 
   return (
     <AppShell title="Contas">
       <div className="space-y-6">
-        <PageHeader title="Contas" description="Saldos atualizados com base nos lançamentos.">
+        <PageHeader title="Contas">
           <CreateEntityDialog
             title="Nova conta"
-            description="Cadastre banco, carteira ou caixa."
             triggerLabel="Nova conta"
             path="/app/contas"
             action={createAccount}

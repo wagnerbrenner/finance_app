@@ -42,7 +42,9 @@ export function FormSelect({
   const controlled = valueProp !== undefined;
   const [internal, setInternal] = useState(defaultValue ?? "");
   const value = controlled ? (valueProp ?? "") : internal;
-  const selectValue = value || null;
+  const selected = options.find((o) => o.value === value);
+  // Evita mostrar UUID quando o valor existe mas as options ainda não carregaram.
+  const selectValue = value && selected ? value : null;
 
   function handleChange(next: string | null) {
     const v = !next || next === EMPTY ? "" : next;
@@ -66,10 +68,12 @@ export function FormSelect({
       >
         <SelectTrigger
           id={id}
-          className="h-11 w-full min-w-0 border-input bg-input/30 text-foreground sm:h-9 dark:bg-input/30"
+          className="h-11 w-full min-w-0 cursor-pointer border-input bg-input/30 text-foreground sm:h-9 dark:bg-input/30"
           size="default"
         >
-          <SelectValue placeholder={placeholder} />
+          <SelectValue placeholder={placeholder}>
+            {selected ? selected.label : null}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent
           className="z-[200] max-h-[min(50dvh,320px)] border border-border bg-popover text-popover-foreground shadow-lg"
@@ -78,7 +82,7 @@ export function FormSelect({
           align="start"
         >
           {!required ? (
-            <SelectItem value={EMPTY} className="text-muted-foreground">
+            <SelectItem value={EMPTY} className="cursor-pointer text-muted-foreground">
               {placeholder}
             </SelectItem>
           ) : null}
@@ -86,7 +90,7 @@ export function FormSelect({
             <SelectItem
               key={option.value}
               value={option.value}
-              className="text-popover-foreground focus:bg-accent focus:text-accent-foreground"
+              className="cursor-pointer text-popover-foreground focus:bg-accent focus:text-accent-foreground"
             >
               {option.label}
             </SelectItem>

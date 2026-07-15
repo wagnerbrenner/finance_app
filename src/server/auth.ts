@@ -15,6 +15,7 @@ export const requireUserId = cache(async (): Promise<string> => {
 });
 
 export function toNumber(value: string | number | null | undefined): number {
-  if (value == null) return 0;
-  return typeof value === "number" ? value : Number(value);
+  if (value == null || value === "") return 0;
+  const n = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(n) ? n : 0;
 }

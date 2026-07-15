@@ -43,8 +43,11 @@ No Vercel → Project → **Settings → Environment Variables**, defina:
 |----------|--------|
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://xxxx.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | chave publishable (ou use `NEXT_PUBLIC_SUPABASE_ANON_KEY`) |
-| `NEXT_PUBLIC_SITE_URL` | URL de produção, ex. `https://seu-app.vercel.app` |
+| `NEXT_PUBLIC_SITE_URL` | `https://finance-app-nine-blush.vercel.app` |
 | `DATABASE_URL` | string do **pooler** (porta 6543) |
+| `RESEND_API_KEY` | chave da API Resend |
+| `EMAIL_FROM` | ex. `Finance OS <onboarding@resend.dev>` (ou domínio verificado) |
+| `CRON_SECRET` | segredo longo (Vercel Cron envia `Authorization: Bearer …`) |
 
 Aplique em **Production** (e Preview se quiser testar PRs).
 
@@ -52,10 +55,19 @@ Aplique em **Production** (e Preview se quiser testar PRs).
 
 **Authentication → URL Configuration**:
 
-- **Site URL:** `https://seu-app.vercel.app`
+- **Site URL:** `https://finance-app-nine-blush.vercel.app`
 - **Redirect URLs:** adicione  
-  - `https://seu-app.vercel.app/auth/callback`  
+  - `https://finance-app-nine-blush.vercel.app/auth/callback`  
   - `http://localhost:3000/auth/callback` (dev local)
+
+**E-mail de confirmação branded:**
+
+1. Ative **Confirm email** em Authentication → Providers → Email  
+2. Authentication → **SMTP Settings**: configure SMTP do Resend (host `smtp.resend.com`, user `resend`, senha = API key)  
+3. Authentication → **Email Templates → Confirm signup**: cole o HTML de [`docs/email-confirm-template.html`](email-confirm-template.html)  
+4. Links de confirmação usam `NEXT_PUBLIC_SITE_URL` + `/auth/callback`
+
+**Lembretes de vencimento:** cron diário em `vercel.json` (`/api/cron/due-reminders` às 11:00 UTC ≈ 08:00 BRT). Aplique a migration `0005_email_reminder_log.sql`.
 
 ## 5. Importar o projeto na Vercel
 
@@ -68,8 +80,8 @@ Aplique em **Production** (e Preview se quiser testar PRs).
 
 ## 6. Testar após o deploy
 
-1. Abra `https://seu-app.vercel.app/login`
-2. Crie conta / entre
+1. Abra `https://finance-app-nine-blush.vercel.app/login`
+2. Crie conta / entre (confirme e-mail se estiver ativo)
 3. Confira o **Painel**
 4. Faça um **Novo lançamento** (desktop) ou **+** (celular)
 5. Abra **Renda** e complete o onboarding (freela/Uber ou só salário)
@@ -91,9 +103,10 @@ Para forçar: Vercel → Deployments → **Redeploy**.
 
 ## Checklist rápido
 
-- [ ] Migrations 0000–0004 no Supabase  
-- [ ] Env vars na Vercel (incluindo pooler)  
+- [ ] Migrations 0000–0005 no Supabase  
+- [ ] Env vars na Vercel (incluindo pooler, Resend, CRON_SECRET)  
 - [ ] Site URL + `/auth/callback` no Supabase  
+- [ ] Template de confirmação branded + SMTP Resend  
 - [ ] Deploy OK  
 - [ ] Login + Painel + lançamento testados  
 
@@ -101,4 +114,5 @@ Para forçar: Vercel → Deployments → **Redeploy**.
 
 - As migrations **não** rodam no `npm run build` — sempre aplique no Supabase manualmente.
 - O módulo **Importar** está oculto na navegação; a rota `/app/importar` ainda existe se precisar.
+- Relatórios foram fundidos no Painel (`/app/relatorios` redireciona).
 - Em produção, evite expor senhas do banco; use só variáveis da Vercel.

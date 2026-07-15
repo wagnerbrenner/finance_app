@@ -310,3 +310,26 @@ export const financeSettings = pgTable("finance_settings", {
     .defaultNow()
     .notNull(),
 });
+
+/** Dedupe de e-mails de vencimento (2d / 1d / hoje). */
+export const emailReminderLog = pgTable(
+  "email_reminder_log",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull(),
+    notificationKey: text("notification_key").notNull(),
+    severity: text("severity").notNull(),
+    dueDate: date("due_date", { mode: "string" }).notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true, mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    uniqueIndex("email_reminder_log_user_key_sev_due_uidx").on(
+      t.userId,
+      t.notificationKey,
+      t.severity,
+      t.dueDate,
+    ),
+  ],
+);

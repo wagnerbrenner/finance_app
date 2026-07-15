@@ -37,8 +37,7 @@ export function IncomeOnboardingDialog({ open }: { open: boolean }) {
 
   return (
     <LaunchDialog
-      title="Suas fontes de renda"
-      description="Você faz freela ou Uber? Assim ativamos as abas certas. Dá para mudar depois."
+      title="Fontes de renda"
       open={isOpen}
       onOpenChange={() => {
         /* force choice — no dismiss without saving */
@@ -53,7 +52,7 @@ export function IncomeOnboardingDialog({ open }: { open: boolean }) {
             onChange={(e) => setHasFreelance(e.target.checked)}
           />
           <span>
-            <span className="font-medium">Freelance</span>
+            <span className="font-medium">Freela</span>
             <span className="block text-muted-foreground">
               Projetos, consultoria, serviços avulsos
             </span>

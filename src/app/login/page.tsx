@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -42,10 +42,11 @@ export default function LoginPage() {
         <Card className="border-border/70 bg-card/80 backdrop-blur">
           <CardHeader>
             <CardTitle>Entrar</CardTitle>
-            <CardDescription>Entre com e-mail e senha.</CardDescription>
           </CardHeader>
           <CardContent>
-            <LoginForm />
+            <Suspense fallback={<p className="text-sm text-muted-foreground">Carregando…</p>}>
+              <LoginForm />
+            </Suspense>
           </CardContent>
         </Card>
       </div>

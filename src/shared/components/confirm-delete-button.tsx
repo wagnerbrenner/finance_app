@@ -28,7 +28,7 @@ export function ConfirmDeleteButton({
     if (await actionToast(() => action(data), "Registro excluído.")) setOpen(false);
   }
   return (
-    <LaunchDialog title={`Excluir ${label}?`} description="Esta ação remove o registro da sua visualização." open={open} onOpenChange={setOpen} trigger={<Button variant="ghost" size="icon-sm" aria-label={`Excluir ${label}`}><Trash2 /></Button>}>
+    <LaunchDialog title={`Excluir ${label}?`} open={open} onOpenChange={setOpen} trigger={<Button variant="ghost" size="icon-sm" aria-label={`Excluir ${label}`}><Trash2 /></Button>}>
       <DialogFooter>
         <DialogClose render={<Button variant="outline" />}>Cancelar</DialogClose>
         <Button variant="destructive" onClick={() => void remove()}>Excluir</Button>

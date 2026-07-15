@@ -6,7 +6,7 @@ import { confirmRecurringOccurrence, skipRecurringOccurrence } from "@/features/
 import { actionToast } from "@/shared/components/action-toast";
 import { FormField } from "@/shared/components/form-field";
 import { LaunchDialog } from "@/shared/components/launch-dialog";
-import { formatBRL } from "@/shared/lib/formatters";
+import { formatBRL, localDateISO } from "@/shared/lib/formatters";
 
 export function ConfirmOccurrenceDialog({
   occurrenceId,
@@ -49,7 +49,7 @@ export function ConfirmOccurrenceDialog({
           name="date"
           label="Data do pagamento"
           type="date"
-          defaultValue={new Date().toISOString().slice(0, 10)}
+          defaultValue={localDateISO()}
           required
         />
         <div className="flex justify-end">

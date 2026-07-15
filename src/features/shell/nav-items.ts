@@ -7,7 +7,6 @@ import {
   Target,
   TrendingUp,
   Banknote,
-  FileBarChart,
   RefreshCw,
   type LucideIcon,
 } from "lucide-react";
@@ -34,7 +33,6 @@ export const SECONDARY_NAV: NavItem[] = [
   { title: "Dívidas", href: "/app/dividas", icon: Landmark, enabled: true },
   { title: "Metas", href: "/app/metas", icon: Target, enabled: true },
   { title: "Investimentos", href: "/app/investimentos", icon: TrendingUp, enabled: true },
-  { title: "Relatórios", href: "/app/relatorios", icon: FileBarChart, enabled: true },
 ];
 
 /** Lista completa da sidebar (Importar oculto). */
