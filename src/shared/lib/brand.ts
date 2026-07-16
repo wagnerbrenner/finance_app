@@ -1,9 +1,11 @@
 /** Brand identity — keep UI/docs in sync via this module. */
 export const BRAND = {
-  name: "Finora",
-  tagline: "Suas finanças em ordem",
-  shortPitch: "Organize o dinheiro com clareza — saldo, metas e o próximo passo.",
+  name: "Tchê Organiza",
+  shortName: "Tchê",
+  tagline: "Bah, as contas no lugar!",
+  shortPitch: "Organize o bolso com jeito de gaúcho — saldo, metas e o próximo passo sem enrolação.",
   description:
-    "Finora é o sistema pessoal para organizar patrimônio, fluxo de caixa, dívidas e metas — com visão de CFO, sem planilha caótica.",
-  emailFromFallback: "Finora <onboarding@resend.dev>",
+    "Tchê Organiza é o app de gestão financeira pessoal com cara do Sul: organize patrimônio, fluxo de caixa, dívidas e metas — sem planilha caótica.",
+  emailFromFallback: "Tchê Organiza <onboarding@resend.dev>",
+  greeting: "E aí, tchê",
 } as const;

@@ -129,3 +129,20 @@
     @apply font-sans;
   }
 }
+
+/* Tchê Organiza — auth form accents on branded shell */
+.tche-auth-form label {
+  color: #a8c4b8;
+}
+.tche-auth-form input {
+  border-color: rgb(27 122 90 / 45%);
+  background: rgb(12 31 24 / 70%);
+  color: #e8f0eb;
+}
+.tche-auth-form input::placeholder {
+  color: rgb(168 196 184 / 55%);
+}
+.tche-auth-form input:focus-visible {
+  border-color: #f0c14a;
+  box-shadow: 0 0 0 3px rgb(240 193 74 / 25%);
+}

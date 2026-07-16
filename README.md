@@ -1,4 +1,4 @@
-# Finora
+# Tch� Organiza
 
 Sistema pessoal para organizar patrimônio, fluxo de caixa, dívidas e metas.
 

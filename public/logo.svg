@@ -1,22 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Finora">
-  <defs>
-    <linearGradient id="finora-g" x1="6" y1="4" x2="28" y2="30" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#5EEAD4"/>
-      <stop offset="1" stop-color="#14B8A6"/>
-    </linearGradient>
-  </defs>
-  <rect width="32" height="32" rx="8" fill="url(#finora-g)"/>
-  <!-- Abstract F + cash-flow arc -->
-  <path
-    fill="#06201C"
-    d="M9.2 8.2h13.1c.55 0 .9.55.7 1.05l-2.05 4.55c-.12.28-.12.6 0 .88l2.05 4.55c.2.5-.15 1.05-.7 1.05H12.4v3.5c0 .55-.45 1-1 1H9.2c-.55 0-1-.45-1-1V9.2c0-.55.45-1 1-1zm3.2 3.35v2.9h5.35l-1.05-2.9H12.4zm0 5.55v2.9h4.2l-1.05-2.9H12.4z"
-  />
-  <path
-    fill="none"
-    stroke="#06201C"
-    stroke-width="1.7"
-    stroke-linecap="round"
-    d="M21.2 22.8c2.6-1.2 4.2-3.5 4.2-6.2 0-2.2-1.1-4.1-2.8-5.3"
-    opacity="0.85"
-  />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Tchê Organiza">
+  <rect width="32" height="32" rx="8" fill="#0C1F18"/>
+  <ellipse cx="16" cy="14" rx="11" ry="2.2" fill="#C43C3C"/>
+  <path fill="#1B7A5A" d="M7.5 13.2c0-5.2 3.8-8.4 8.5-8.4s8.5 3.2 8.5 8.4H7.5z"/>
+  <ellipse cx="16" cy="13.2" rx="8.5" ry="1.6" fill="#144F3C"/>
+  <circle cx="22.5" cy="22.5" r="6" fill="#F0C14A"/>
+  <circle cx="22.5" cy="22.5" r="4.4" fill="none" stroke="#B8860B" stroke-width="1.2"/>
+  <path fill="#7A5A00" d="M21.2 20.4h1.1v1.1h1.2v1.1h-1.2v2.8h-1.1v-2.8h-1.1v-1.1h1.1z"/>
 </svg>
