@@ -17,11 +17,11 @@ import {
 import { formatBRL } from "@/shared/lib/formatters";
 
 const FALLBACK_COLORS = [
-  "#14b8a6",
-  "#f97316",
-  "#ef4444",
-  "#a78bfa",
   "#38bdf8",
+  "#f97316",
+  "#a78bfa",
+  "#14b8a6",
+  "#ef4444",
   "#eab308",
   "#f43f5e",
   "#94a3b8",
@@ -32,8 +32,8 @@ const GRID = { stroke: "#27272a", strokeDasharray: "3 3" };
 
 function formatAxisBRL(value: number) {
   const abs = Math.abs(value);
-  if (abs >= 1_000_000) return `R$${((value / 1_000_000).toFixed(1))}M`;
-  if (abs >= 1_000) return `R$${((value / 1_000).toFixed(abs >= 10_000 ? 0 : 1))}k`;
+  if (abs >= 1_000_000) return `R$${value / 1_000_000}M`;
+  if (abs >= 1_000) return `R$${(value / 1_000).toFixed(abs >= 10_000 ? 0 : 1)}k`;
   return `R$${Math.round(value)}`;
 }
 
@@ -66,9 +66,9 @@ export function CategoryExpenseChart({
   const total = chartData.reduce((sum, item) => sum + item.total, 0);
 
   return (
-    <div className="space-y-4">
-      <div className="h-52 w-full">
-        <ResponsiveContainer width="100%" height={208}>
+    <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-8">
+      <div className="h-44 w-44 shrink-0 sm:h-48 sm:w-48">
+        <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={chartData}
@@ -76,8 +76,8 @@ export function CategoryExpenseChart({
               nameKey="name"
               cx="50%"
               cy="50%"
-              innerRadius={52}
-              outerRadius={84}
+              innerRadius={48}
+              outerRadius={72}
               paddingAngle={2}
               stroke="transparent"
             >
@@ -96,23 +96,23 @@ export function CategoryExpenseChart({
           </PieChart>
         </ResponsiveContainer>
       </div>
-      <p className="text-center text-xs text-muted-foreground">
-        Total do mês: <span className="font-medium text-foreground">{formatBRL(total)}</span>
-      </p>
-      <ul className="space-y-2">
+
+      <ul className="w-full min-w-0 flex-1 space-y-3">
         {chartData.map((item) => {
           const pct = total > 0 ? Math.round((item.total / total) * 100) : 0;
           return (
-            <li key={item.name} className="flex items-center justify-between gap-2 text-sm">
-              <span className="flex min-w-0 items-center gap-2">
+            <li key={item.name} className="flex items-center justify-between gap-3 text-sm">
+              <span className="flex min-w-0 items-center gap-2.5">
                 <span
                   className="size-2.5 shrink-0 rounded-full"
                   style={{ background: item.fill }}
                 />
-                <span className="truncate">{item.name}</span>
-                <span className="shrink-0 text-xs text-muted-foreground">{pct}%</span>
+                <span className="truncate text-muted-foreground">{item.name}</span>
               </span>
-              <span className="shrink-0 font-medium">{formatBRL(item.total)}</span>
+              <span className="shrink-0 tabular-nums text-foreground">
+                {formatBRL(item.total)}
+                <span className="text-muted-foreground"> · {pct}%</span>
+              </span>
             </li>
           );
         })}
@@ -153,9 +153,7 @@ export function IncomeExpenseChart({
   const hasData = chartData.some((row) => row.income > 0 || row.expense > 0);
 
   if (!hasData) {
-    return (
-      <ChartEmpty message="Sem lançamentos nos últimos 6 meses." />
-    );
+    return <ChartEmpty message="Sem lançamentos nos últimos 6 meses." />;
   }
 
   const maxValue = Math.max(...chartData.flatMap((r) => [r.income, r.expense]), 1);

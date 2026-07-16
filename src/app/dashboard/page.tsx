@@ -15,6 +15,7 @@ import {
   IncomeExpenseChart,
 } from "@/features/dashboard/components/expense-charts";
 import { DueAlertsBanner } from "@/features/notifications/components/due-alerts-banner";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Painel",
@@ -34,12 +35,28 @@ export default async function DashboardPage() {
   ]);
   const { kpis } = dashboard;
   const savingsPct = Math.round(kpis.savingsRate * 100);
+  const monthBalance = kpis.month.income - kpis.month.expense;
 
-  const kpiCards: { label: string; value: number }[] = [
-    { label: "Saldo projetado", value: kpis.projectedYearEndBalance },
-    { label: "Saldo em contas", value: kpis.accountBalance },
-    { label: "Receitas do mês", value: kpis.month.income },
-    { label: "Despesas do mês", value: kpis.month.expense },
+  const monthKpis: {
+    label: string;
+    value: number;
+    valueClass: string;
+  }[] = [
+    {
+      label: "Receitas do mês",
+      value: kpis.month.income,
+      valueClass: "text-emerald-400",
+    },
+    {
+      label: "Despesas do mês",
+      value: kpis.month.expense,
+      valueClass: "text-rose-400",
+    },
+    {
+      label: "Saldo do mês",
+      value: monthBalance,
+      valueClass: monthBalance >= 0 ? "text-emerald-400" : "text-rose-400",
+    },
   ];
 
   return (
@@ -51,18 +68,27 @@ export default async function DashboardPage() {
           <Badge variant={savingsPct >= 20 ? "default" : savingsPct >= 0 ? "secondary" : "destructive"}>
             Taxa de economia: {savingsPct}%
           </Badge>
+          <span className="text-xs text-muted-foreground">
+            Contas: {formatBRL(kpis.accountBalance)} · Projetado:{" "}
+            {formatBRL(kpis.projectedYearEndBalance)}
+          </span>
         </section>
 
-        <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-          {kpiCards.map((card) => (
+        <section className="grid gap-3 sm:grid-cols-3">
+          {monthKpis.map((card) => (
             <Card key={card.label}>
               <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground sm:text-sm">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   {card.label}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-lg font-semibold tracking-tight sm:text-2xl">
+                <p
+                  className={cn(
+                    "text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl",
+                    card.valueClass,
+                  )}
+                >
                   {formatBRL(card.value)}
                 </p>
               </CardContent>
@@ -73,18 +99,18 @@ export default async function DashboardPage() {
         <section className="grid gap-4 md:gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Onde foi o dinheiro</CardTitle>
+              <CardTitle>Fluxo de caixa</CardTitle>
             </CardHeader>
             <CardContent>
-              <CategoryExpenseChart data={dashboard.expensesByCategory} />
+              <CashFlowChart data={dashboard.cashFlow} meta={dashboard.cashFlowMeta} />
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Receitas × despesas</CardTitle>
+              <CardTitle>Despesas por categoria</CardTitle>
             </CardHeader>
             <CardContent>
-              <IncomeExpenseChart data={dashboard.incomeVsExpenseByMonth} />
+              <CategoryExpenseChart data={dashboard.expensesByCategory} />
             </CardContent>
           </Card>
         </section>
@@ -92,10 +118,10 @@ export default async function DashboardPage() {
         <section className="grid gap-4 md:gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Fluxo projetado — 3 meses</CardTitle>
+              <CardTitle>Receitas × despesas</CardTitle>
             </CardHeader>
             <CardContent>
-              <CashFlowChart data={dashboard.cashFlow} meta={dashboard.cashFlowMeta} />
+              <IncomeExpenseChart data={dashboard.incomeVsExpenseByMonth} />
             </CardContent>
           </Card>
           <Card>
@@ -105,11 +131,11 @@ export default async function DashboardPage() {
             <CardContent>
               <p className="text-2xl font-semibold">{formatBRL(kpis.nextThirty)}</p>
               <div className="mt-4 flex flex-wrap gap-2 text-sm">
-                <Link href="/app/recorrentes" className="text-teal-400 underline-offset-2 hover:underline">
+                <Link href="/app/recorrentes" className="text-cyan-400 underline-offset-2 hover:underline">
                   Recorrentes
                 </Link>
                 <span className="text-muted-foreground">·</span>
-                <Link href="/app/dividas" className="text-teal-400 underline-offset-2 hover:underline">
+                <Link href="/app/dividas" className="text-cyan-400 underline-offset-2 hover:underline">
                   Dívidas
                 </Link>
               </div>
