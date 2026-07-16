@@ -17,13 +17,17 @@ import {
 
 function Brand({ collapsed }: { collapsed?: boolean }) {
   return (
-    <Link href="/dashboard" className="flex items-center gap-2.5 px-2">
+    <Link
+      href="/dashboard"
+      className={cn("flex items-center gap-2.5", collapsed ? "justify-center" : "px-2")}
+      title={collapsed ? "Finance OS" : undefined}
+    >
       <img
         src="/logo.svg"
         alt=""
         width={32}
         height={32}
-        className="size-8 rounded-md"
+        className="size-8 shrink-0 rounded-md"
       />
       {!collapsed ? (
         <span className="font-[family-name:var(--font-display)] text-base font-semibold tracking-tight">
@@ -112,33 +116,26 @@ export function AppSidebar() {
       >
         <div
           className={cn(
-            "mb-6 flex items-center",
-            collapsed ? "justify-center px-2" : "justify-between px-3",
+            "mb-6 flex",
+            collapsed
+              ? "flex-col items-center gap-2 px-2"
+              : "items-center justify-between px-3",
           )}
         >
           <Brand collapsed={collapsed} />
-          {!collapsed ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              onClick={toggle}
-              aria-label="Recolher menu"
-            >
-              <PanelLeftClose className="size-4" />
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className="absolute right-2 top-4"
-              onClick={toggle}
-              aria-label="Expandir menu"
-            >
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            onClick={toggle}
+            aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
+          >
+            {collapsed ? (
               <PanelLeft className="size-4" />
-            </Button>
-          )}
+            ) : (
+              <PanelLeftClose className="size-4" />
+            )}
+          </Button>
         </div>
         <NavList collapsed={collapsed} />
       </aside>

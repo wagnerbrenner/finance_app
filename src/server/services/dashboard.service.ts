@@ -194,8 +194,9 @@ export async function getDashboard(userId: string) {
     const otherIncome = toNumber(row?.otherIncome);
     const expense = toNumber(row?.expense);
 
-    // Mês sem lançamento de salário → usa recorrência de salário (se existir)
-    if (salary <= 0 && salaryRecs.length > 0) {
+    // Só projeta salário recorrente no mês atual (não reescreve histórico excluído).
+    const isCurrentMonth = key === format(now, "yyyy-MM");
+    if (isCurrentMonth && salary <= 0 && salaryRecs.length > 0) {
       for (const rec of salaryRecs) {
         const startKey = rec.startDate.slice(0, 7);
         const endKey = rec.endDate ? rec.endDate.slice(0, 7) : null;
