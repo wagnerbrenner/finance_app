@@ -17,7 +17,7 @@ import {
 import { DueAlertsBanner } from "@/features/notifications/components/due-alerts-banner";
 
 export const metadata: Metadata = {
-  title: "Painel · Finance OS",
+  title: "Painel",
 };
 
 export default async function DashboardPage() {

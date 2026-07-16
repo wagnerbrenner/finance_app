@@ -1,4 +1,4 @@
-# Publicar o Finance OS na Vercel
+# Publicar o Finora na Vercel
 
 Guia completo para colocar o app online (Next.js + Supabase Auth + Postgres).
 
@@ -46,7 +46,7 @@ No Vercel → Project → **Settings → Environment Variables**, defina:
 | `NEXT_PUBLIC_SITE_URL` | `https://finance-app-nine-blush.vercel.app` |
 | `DATABASE_URL` | string do **pooler** (porta 6543) |
 | `RESEND_API_KEY` | chave da API Resend |
-| `EMAIL_FROM` | ex. `Finance OS <onboarding@resend.dev>` (ou domínio verificado) |
+| `EMAIL_FROM` | ex. `Finora <onboarding@resend.dev>` (ou domínio verificado) |
 | `CRON_SECRET` | segredo longo (Vercel Cron envia `Authorization: Bearer …`) |
 
 Aplique em **Production** (e Preview se quiser testar PRs).
@@ -69,7 +69,7 @@ Siga [`docs/email-confirmacao.md`](email-confirmacao.md): Site URL de prod, temp
 ## 5. Importar o projeto na Vercel
 
 1. Acesse [vercel.com/new](https://vercel.com/new)
-2. **Import** o repositório GitHub do Finance OS
+2. **Import** o repositório GitHub do Finora
 3. Framework: **Next.js** (detectado automaticamente)
 4. Build Command: `npm run build` (padrão)
 5. Confirme que as env vars do passo 3 estão preenchidas

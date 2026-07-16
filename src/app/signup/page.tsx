@@ -7,9 +7,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SignupForm } from "@/features/auth/components/signup-form";
+import { BRAND } from "@/shared/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Criar conta · Finance OS",
+  title: "Criar conta",
 };
 
 export default function SignupPage() {
@@ -32,10 +33,10 @@ export default function SignupPage() {
               height={32}
               className="size-8 rounded-md"
             />
-            Finance OS
+            {BRAND.name}
           </Link>
           <p className="mt-2 text-sm text-muted-foreground">
-            Comece a organizar sua vida financeira.
+            {BRAND.shortPitch}
           </p>
         </div>
         <Card className="border-border/70 bg-card/80 backdrop-blur">

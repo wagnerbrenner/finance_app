@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Syne, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/shared/components/providers/query-provider";
+import { BRAND } from "@/shared/lib/brand";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -21,11 +22,10 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Finance OS",
-    template: "%s · Finance OS",
+    default: BRAND.name,
+    template: `%s · ${BRAND.name}`,
   },
-  description:
-    "ERP financeiro pessoal — patrimônio, fluxo de caixa, projeções e CFO digital.",
+  description: BRAND.description,
 };
 
 export default function RootLayout({

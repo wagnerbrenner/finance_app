@@ -1,4 +1,4 @@
-# E-mail de confirmação (Finance OS)
+# E-mail de confirmação (Finora)
 
 O visual do e-mail **não vem do código Next.js** — ele é configurado no painel do Supabase.
 O app já envia o link de confirmação para a URL de produção via `emailRedirectTo`.
@@ -21,7 +21,7 @@ Na Vercel, confirme a env:
 
 1. Abra o HTML: [`confirm-signup.html`](./email-templates/confirm-signup.html)
 2. Supabase → **Authentication → Email Templates → Confirm signup**
-3. **Subject:** `Confirme sua conta no Finance OS`
+3. **Subject:** `Confirme sua conta no Finora`
 4. Cole o HTML completo (substitua o template padrão em inglês)
 5. Salve
 
@@ -37,12 +37,12 @@ Sem SMTP custom, o remetente continua `noreply@mail.app.supabase.io` e o rodapé
 - Port: `465` (ou `587`)
 - User: `resend`
 - Pass: sua `RESEND_API_KEY`
-- Sender: ex. `Finance OS <onboarding@resend.dev>` ou domínio verificado no Resend
+- Sender: ex. `Finora <onboarding@resend.dev>` ou domínio verificado no Resend
 
 ## 4. Testar
 
 1. Delete o usuário de teste (se precisar) e cadastre de novo **pelo site de produção**
-2. O e-mail deve vir em PT-BR com marca Finance OS
+2. O e-mail deve vir em PT-BR com marca Finora
 3. O link deve abrir `https://finance-app-nine-blush.vercel.app/auth/callback?...` e depois o painel/login
 
 ## Outros templates (opcional)

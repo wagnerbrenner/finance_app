@@ -8,9 +8,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LoginForm } from "@/features/auth/components/login-form";
+import { BRAND } from "@/shared/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Entrar · Finance OS",
+  title: "Entrar",
 };
 
 export default function LoginPage() {
@@ -33,10 +34,10 @@ export default function LoginPage() {
               height={32}
               className="size-8 rounded-md"
             />
-            Finance OS
+            {BRAND.name}
           </Link>
           <p className="mt-2 text-sm text-muted-foreground">
-            Seu CFO pessoal. Entre para continuar.
+            {BRAND.tagline}. Entre para continuar.
           </p>
         </div>
         <Card className="border-border/70 bg-card/80 backdrop-blur">

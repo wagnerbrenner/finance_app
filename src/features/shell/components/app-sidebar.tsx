@@ -7,6 +7,7 @@ import { PanelLeftClose, PanelLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/features/shell/nav-items";
 import { useUiStore } from "@/shared/stores/ui-store";
+import { BRAND } from "@/shared/lib/brand";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -20,7 +21,7 @@ function Brand({ collapsed }: { collapsed?: boolean }) {
     <Link
       href="/dashboard"
       className={cn("flex items-center gap-2.5", collapsed ? "justify-center" : "px-2")}
-      title={collapsed ? "Finance OS" : undefined}
+      title={collapsed ? BRAND.name : undefined}
     >
       <img
         src="/logo.svg"
@@ -31,7 +32,7 @@ function Brand({ collapsed }: { collapsed?: boolean }) {
       />
       {!collapsed ? (
         <span className="font-[family-name:var(--font-display)] text-base font-semibold tracking-tight">
-          Finance OS
+          {BRAND.name}
         </span>
       ) : null}
     </Link>

@@ -7,6 +7,7 @@ import {
   type FinanceNotification,
 } from "@/server/services/notifications.service";
 import { getSiteUrl } from "@/shared/lib/site-url";
+import { BRAND } from "@/shared/lib/brand";
 import { NOTIFICATION_SEVERITY_LABELS } from "@/shared/lib/labels";
 
 function getResend() {
@@ -16,7 +17,7 @@ function getResend() {
 }
 
 function fromAddress() {
-  return process.env.EMAIL_FROM ?? "Finance OS <onboarding@resend.dev>";
+  return process.env.EMAIL_FROM ?? BRAND.emailFromFallback;
 }
 
 export function brandEmailShell(title: string, bodyHtml: string) {
@@ -29,14 +30,14 @@ export function brandEmailShell(title: string, bodyHtml: string) {
     <tr><td align="center">
       <table role="presentation" width="100%" style="max-width:560px;background:#18181b;border:1px solid #27272a;border-radius:16px;overflow:hidden;">
         <tr><td style="padding:24px 28px;background:linear-gradient(135deg,#0f766e,#134e4a);">
-          <p style="margin:0;font-size:20px;font-weight:700;letter-spacing:-0.02em;">Finance OS</p>
-          <p style="margin:6px 0 0;font-size:13px;opacity:0.9;">Seu CFO pessoal</p>
+          <p style="margin:0;font-size:20px;font-weight:700;letter-spacing:-0.02em;">${BRAND.name}</p>
+          <p style="margin:6px 0 0;font-size:13px;opacity:0.9;">${BRAND.tagline}</p>
         </td></tr>
         <tr><td style="padding:28px;">
           <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;">${title}</h1>
           ${bodyHtml}
           <p style="margin:28px 0 0;font-size:12px;color:#a1a1aa;">
-            Este e-mail foi enviado por Finance OS ·
+            Este e-mail foi enviado por ${BRAND.name} ·
             <a href="${site}" style="color:#2dd4bf;text-decoration:none;">${site.replace(/^https?:\/\//, "")}</a>
           </p>
         </td></tr>
@@ -120,8 +121,8 @@ export async function sendDueReminderEmailsForAllUsers() {
 
     const hasCritical = toSend.some((n) => n.severity === "overdue" || n.severity === "due_today");
     const title = hasCritical
-      ? "Atenção: vencimentos urgentes no Finance OS"
-      : "Lembrete de vencimentos — Finance OS";
+      ? `Atenção: vencimentos urgentes no ${BRAND.name}`
+      : `Lembrete de vencimentos — ${BRAND.name}`;
 
     const html = brandEmailShell(
       title,

@@ -1,29 +1,25 @@
-# Finance OS
+# Finora
 
-SaaS pessoal de gestão financeira (ERP + planejador + CFO).
+Sistema pessoal para organizar patrimônio, fluxo de caixa, dívidas e metas.
 
-## Setup
+**Tagline:** Suas finanças em ordem.
 
-1. `cp .env.example .env.local` e preencha as variáveis
-2. No Supabase SQL Editor (ou scripts), rode na ordem:
-   - `supabase/migrations/0000_phase0_profiles.sql`
-   - `supabase/migrations/0001_domain_schema.sql`
-   - `supabase/migrations/0002_ux_renda_consorcio.sql`
-3. Auth → Email: desative **Confirm email** em desenvolvimento
-4. `npm install && npm run dev`
+## Stack
 
-## Módulos
+- Next.js (App Router) + React
+- Supabase Auth + Postgres (Drizzle)
+- Vercel
 
-| Rota | Função |
-|------|--------|
-| `/dashboard` | KPIs, fluxo, projeções, advisor, vencimentos |
-| `/app/contas` | Contas com saldo calculado |
-| `/app/transacoes` | Lançamentos via modal (+ CTA no topbar) |
-| `/app/cartoes` | Cartões, parcelas e recorrências |
-| `/app/dividas` | Dívidas/financiamentos + simulador |
-| `/app/metas` | Metas com progresso |
-| `/app/investimentos` | Carteira + consórcios |
-| `/app/renda-extra` | Uber e freelance |
-| `/app/relatorios` | Relatórios |
+## Docs
 
-Notificações in-app: sino no topbar (recorrências, dívidas, parcelas, consórcios).
+- [Integrações bancárias (Nubank / Open Finance)](docs/integrations-banking.md)
+- [Deploy Vercel](docs/deploy-vercel.md)
+- [E-mail de confirmação](docs/email-confirmacao.md)
+
+## Dev
+
+```bash
+npm install
+cp .env.example .env.local   # preencher
+npm run dev
+```
