@@ -334,3 +334,16 @@ export const emailReminderLog = pgTable(
     ),
   ],
 );
+/** Mensagens do SAC (FAQ miss ? ticket). */
+export const supportMessages = pgTable("support_messages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id"),
+  email: text("email"),
+  name: text("name"),
+  message: text("message").notNull(),
+  matchedIntent: text("matched_intent"),
+  status: text("status").notNull().default("open"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+    .defaultNow()
+    .notNull(),
+});
