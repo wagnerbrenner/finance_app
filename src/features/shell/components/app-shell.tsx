@@ -2,6 +2,7 @@ import { AppSidebar } from "@/features/shell/components/app-sidebar";
 import { AppTopbar } from "@/features/shell/components/app-topbar";
 import { MobileBottomNav } from "@/features/shell/components/mobile-bottom-nav";
 import { LaunchHost } from "@/features/shell/components/launch-host";
+import { SupportWidget } from "@/features/support/components/support-widget";
 import { getCurrentProfile } from "@/features/auth/actions";
 import { redirect } from "next/navigation";
 
@@ -32,6 +33,7 @@ export async function AppShell({ children, title }: AppShellProps) {
         </main>
         <MobileBottomNav />
         <LaunchHost />
+        <SupportWidget userEmail={profile.email} />
       </div>
     </div>
   );

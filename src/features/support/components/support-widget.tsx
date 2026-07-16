@@ -10,18 +10,26 @@ import { Button } from "@/components/ui/button";
 
 type ChatMsg = { role: "user" | "assistant"; text: string };
 
-export function SupportWidget() {
+type SupportWidgetProps = {
+  userEmail?: string | null;
+};
+
+export function SupportWidget({ userEmail }: SupportWidgetProps) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(userEmail ?? "");
   const [busy, setBusy] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([
     {
       role: "assistant",
-      text: `E aí! Sou o assistente do ${BRAND.name}. Pergunte sobre login, lançar gasto, painel ou planos — se eu não souber, aviso o time.`,
+      text: `E aí! Sou o assistente do ${BRAND.name}. Pergunte sobre lançar gasto, painel, recorrentes ou planos — se eu não souber, aviso o time.`,
     },
   ]);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (userEmail) setEmail(userEmail);
+  }, [userEmail]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

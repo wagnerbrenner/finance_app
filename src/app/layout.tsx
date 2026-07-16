@@ -4,7 +4,6 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/shared/components/providers/query-provider";
-import { SupportWidget } from "@/features/support/components/support-widget";
 import { BRAND } from "@/shared/lib/brand";
 import "./globals.css";
 
@@ -48,7 +47,6 @@ export default function RootLayout({
       <body className="min-h-full bg-background font-sans text-foreground">
         <QueryProvider>
           {children}
-          <SupportWidget />
           <Toaster richColors position="top-right" />
           <Analytics />
           <SpeedInsights />
