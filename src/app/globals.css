@@ -130,19 +130,23 @@
   }
 }
 
-/* Tchê Organiza — auth form accents on branded shell */
+/* Te Organiza — auth form accents */
+.te-auth-form label,
 .tche-auth-form label {
-  color: #a8c4b8;
+  color: #94a3b8;
 }
+.te-auth-form input,
 .tche-auth-form input {
-  border-color: rgb(27 122 90 / 45%);
-  background: rgb(12 31 24 / 70%);
-  color: #e8f0eb;
+  border-color: rgb(34 211 238 / 25%);
+  background: rgb(7 11 20 / 80%);
+  color: #e8eef7;
 }
+.te-auth-form input::placeholder,
 .tche-auth-form input::placeholder {
-  color: rgb(168 196 184 / 55%);
+  color: rgb(148 163 184 / 55%);
 }
+.te-auth-form input:focus-visible,
 .tche-auth-form input:focus-visible {
-  border-color: #f0c14a;
-  box-shadow: 0 0 0 3px rgb(240 193 74 / 25%);
+  border-color: #22d3ee;
+  box-shadow: 0 0 0 3px rgb(34 211 238 / 20%);
 }

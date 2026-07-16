@@ -1,8 +1,8 @@
-# Tchê Organiza
+# Te Organiza
 
-Sistema pessoal para organizar patrimÃ´nio, fluxo de caixa, dÃ­vidas e metas.
+App de gestão financeira pessoal ? saldo, metas e o próximo passo sem planilha caótica.
 
-**Tagline:** Suas finanÃ§as em ordem.
+**Tagline:** Suas finanças, no controle.
 
 ## Stack
 
@@ -12,9 +12,9 @@ Sistema pessoal para organizar patrimÃ´nio, fluxo de caixa, dÃ­vidas e metas.
 
 ## Docs
 
-- [IntegraÃ§Ãµes bancÃ¡rias (Nubank / Open Finance)](docs/integrations-banking.md)
+- [Integrações bancárias (Nubank / Open Finance)](docs/integrations-banking.md)
 - [Deploy Vercel](docs/deploy-vercel.md)
-- [E-mail de confirmaÃ§Ã£o](docs/email-confirmacao.md)
+- [E-mail de confirmação](docs/email-confirmacao.md)
 
 ## Dev
 

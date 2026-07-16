@@ -16,8 +16,8 @@ import { Label } from "@/components/ui/label";
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="w-full bg-[#1B7A5A] text-[#E8F0EB] hover:bg-[#23966D]" disabled={pending}>
-      {pending ? "Entrando…" : "Entrar, tchê"}
+    <Button type="submit" className="w-full bg-cyan-500 text-slate-950 hover:bg-cyan-400" disabled={pending}>
+      {pending ? "Entrando…" : "Entrar"}
     </Button>
   );
 }
@@ -101,7 +101,7 @@ export function LoginForm() {
       ) : null}
       <p className="text-center text-sm text-muted-foreground">
         Não tem conta?{" "}
-        <Link href="/signup" className="font-semibold text-[#F0C14A] hover:text-[#ffe08a]">
+        <Link href="/signup" className="font-semibold text-cyan-400 hover:text-cyan-300">
           Criar conta
         </Link>
       </p>

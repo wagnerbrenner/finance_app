@@ -1,9 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Tchê Organiza">
-  <rect width="32" height="32" rx="8" fill="#0C1F18"/>
-  <ellipse cx="16" cy="14" rx="11" ry="2.2" fill="#C43C3C"/>
-  <path fill="#1B7A5A" d="M7.5 13.2c0-5.2 3.8-8.4 8.5-8.4s8.5 3.2 8.5 8.4H7.5z"/>
-  <ellipse cx="16" cy="13.2" rx="8.5" ry="1.6" fill="#144F3C"/>
-  <circle cx="22.5" cy="22.5" r="6" fill="#F0C14A"/>
-  <circle cx="22.5" cy="22.5" r="4.4" fill="none" stroke="#B8860B" stroke-width="1.2"/>
-  <path fill="#7A5A00" d="M21.2 20.4h1.1v1.1h1.2v1.1h-1.2v2.8h-1.1v-2.8h-1.1v-1.1h1.1z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Te Organiza">
+  <rect width="32" height="32" rx="8" fill="#0B1220"/>
+  <rect x="6" y="8" width="20" height="14" rx="3" fill="#111827" stroke="#22D3EE" stroke-width="1.5"/>
+  <path d="M10 12h5M10 16h8M10 19.5h4" stroke="#67E8F9" stroke-width="1.4" stroke-linecap="round"/>
+  <circle cx="23" cy="22" r="5.2" fill="#F59E0B"/>
+  <circle cx="23" cy="22" r="3.6" fill="none" stroke="#B45309" stroke-width="1"/>
+  <path fill="#78350F" d="M21.8 20.2h1.1v1h1.2v1.1h-1.2v2.4h-1.1v-2.4h-1v-1.1h1z"/>
 </svg>
