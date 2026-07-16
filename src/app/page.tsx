@@ -73,9 +73,9 @@ export default function HomePage() {
         <img
           src="/brand/gaucho-mascot.png"
           alt="Gaúcho do Tchê Organiza"
-          width={380}
-          height={380}
-          className="w-56 drop-shadow-[0_24px_48px_rgba(0,0,0,0.5)] sm:w-72 md:w-[380px]"
+          width={280}
+          height={340}
+          className="h-auto w-44 object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.5)] sm:w-52 md:w-64"
         />
       </main>
     </div>

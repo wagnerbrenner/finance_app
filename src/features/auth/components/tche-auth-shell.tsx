@@ -53,9 +53,9 @@ export function TcheAuthShell({
         }}
       />
 
-      <div className="relative z-10 mx-auto grid h-full w-full max-w-6xl lg:grid-cols-2">
-        {/* Brand / mascot — compact to fit one viewport */}
-        <section className="flex min-h-0 flex-col items-center justify-center gap-2 px-5 py-4 text-center lg:items-start lg:gap-3 lg:px-10 lg:py-6 lg:text-left">
+      <div className="relative z-10 mx-auto grid h-full w-full max-w-5xl lg:grid-cols-[1fr_1.05fr] lg:items-center lg:gap-8 lg:px-8">
+        {/* Brand / mascot */}
+        <section className="flex min-h-0 flex-col items-center justify-center gap-3 px-5 py-3 text-center lg:items-start lg:py-0 lg:text-left">
           <Link
             href="/"
             className="inline-flex shrink-0 items-center gap-2 self-center lg:self-start"
@@ -63,45 +63,45 @@ export function TcheAuthShell({
             <img
               src="/logo.svg"
               alt=""
-              width={36}
-              height={36}
-              className="size-9 rounded-xl shadow-[0_0_28px_rgba(240,193,74,0.35)]"
+              width={32}
+              height={32}
+              className="size-8 rounded-lg shadow-[0_0_24px_rgba(240,193,74,0.35)]"
             />
-            <span className="font-[family-name:var(--font-tche-display)] text-xl tracking-wide text-[#F0C14A] lg:text-2xl">
+            <span className="font-[family-name:var(--font-tche-display)] text-lg tracking-wide text-[#F0C14A] lg:text-xl">
               {BRAND.name}
             </span>
           </Link>
 
-          <div className="relative flex min-h-0 w-full max-w-[200px] flex-1 items-center justify-center sm:max-w-[240px] lg:max-w-[280px]">
+          <div className="relative shrink-0">
             <div
               aria-hidden
-              className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(240,193,74,0.18),transparent_65%)] blur-2xl"
+              className="absolute left-1/2 top-1/2 size-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(240,193,74,0.2),transparent_70%)] blur-xl lg:size-48"
             />
             <img
               src="/brand/gaucho-mascot.png"
               alt="Gaúcho do Tchê Organiza com dinheiro na mão"
-              width={280}
+              width={220}
               height={280}
-              className="relative max-h-[min(42svh,280px)] w-auto object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.5)]"
+              className="relative mx-auto h-[min(34svh,220px)] w-auto object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.45)] lg:h-[min(38svh,260px)]"
             />
           </div>
 
-          <div className="shrink-0">
-            <h1 className="font-[family-name:var(--font-tche-display)] text-2xl leading-tight tracking-wide text-[#E8F0EB] lg:text-4xl">
+          <div className="shrink-0 max-w-sm">
+            <h1 className="font-[family-name:var(--font-tche-display)] text-2xl leading-tight tracking-wide text-[#E8F0EB] lg:text-3xl">
               {BRAND.tagline}
             </h1>
-            <p className="mt-1.5 max-w-md text-sm text-[#A8C4B8] lg:text-base">
+            <p className="mt-2 text-sm leading-snug text-[#A8C4B8] lg:text-[15px]">
               {BRAND.shortPitch}
             </p>
-            <p className="mt-2 hidden font-[family-name:var(--font-tche-display)] text-xs tracking-wider text-[#C43C3C] sm:block">
+            <p className="mt-2 hidden font-[family-name:var(--font-tche-display)] text-[11px] tracking-wider text-[#C43C3C] sm:block">
               ★ organização financeira com sotaque do Sul ★
             </p>
           </div>
         </section>
 
         {/* Form */}
-        <section className="flex min-h-0 items-center justify-center overflow-y-auto px-4 py-4 lg:px-8 lg:py-6">
-          <div className="w-full max-w-md rounded-3xl border border-[#1B7A5A]/45 bg-[#102820]/90 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-md sm:p-7">
+        <section className="flex min-h-0 items-center justify-center px-4 py-3 lg:px-2 lg:py-0">
+          <div className="w-full max-w-[400px] rounded-3xl border border-[#1B7A5A]/45 bg-[#102820]/90 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-md sm:p-7">
             <div className="mb-4">
               <p className="font-[family-name:var(--font-tche-display)] text-xs uppercase tracking-[0.2em] text-[#F0C14A]">
                 {BRAND.greeting}
