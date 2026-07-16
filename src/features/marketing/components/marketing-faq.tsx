@@ -6,24 +6,28 @@ import { cn } from "@/lib/utils";
 
 const FAQS = [
   {
-    q: "O Te Organiza é grátis?",
-    a: "Sim. O plano Grátis cobre transações, categorias, importação de extrato, recorrentes, metas e o painel com gráficos. O Pro (quando a cobrança estiver ativa) adiciona investimentos avançados, patrimônio e lembretes — veja a seção de preços.",
+    q: "Preciso saber de finanças pra usar?",
+    a: "Não. Se você recebe e gasta dinheiro, já dá pra usar. O app é em português simples: lançou o gasto, o painel mostra o mês.",
   },
   {
-    q: "Preciso instalar algo?",
-    a: "Não. É um app web: funciona no celular e no computador pelo navegador.",
+    q: "É grátis mesmo?",
+    a: "Sim. O essencial está liberado: lançamentos, contas, recorrentes, dívidas, metas e o painel. O plano Pro (quando a cobrança existir) adiciona camadas extras — veja a seção de preços.",
   },
   {
-    q: "Como importo o extrato do Nubank?",
-    a: "Exporte o CSV no app do banco, abra Importar no Te Organiza, escolha a conta destino, revise o preview e confirme.",
+    q: "Funciona no celular?",
+    a: "Sim. Abra pelo navegador no celular ou no computador. Não precisa baixar nada nas lojas por enquanto.",
+  },
+  {
+    q: "Vocês conectam no meu banco?",
+    a: "Ainda não. Por enquanto você registra na mão — rápido e sob o seu controle. Integração com banco fica para uma etapa futura; nunca pedimos senha do banco.",
   },
   {
     q: "Meus dados ficam seguros?",
-    a: "Cada registro é isolado por usuário no banco (Row Level Security). Não vendemos dados e não colocamos anúncios no app.",
+    a: "Cada conta só enxerga os próprios registros. Não vendemos dados e não colocamos anúncios no app.",
   },
   {
-    q: "Já posso pagar o Pro?",
-    a: "Ainda não. A assinatura com Mercado Pago está no nosso plano de produto; por enquanto use o app normalmente. Quando abrir, você assina na página de preços.",
+    q: "Já posso assinar o Pro?",
+    a: "Ainda não. Crie a conta e use normalmente. Quando a assinatura abrir, será pela página de preços.",
   },
 ] as const;
 

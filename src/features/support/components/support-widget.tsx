@@ -18,7 +18,7 @@ export function SupportWidget() {
   const [messages, setMessages] = useState<ChatMsg[]>([
     {
       role: "assistant",
-      text: `E aí! Sou o assistente do ${BRAND.name}. Pergunte sobre login, importar CSV, painel ou planos — se eu não souber, aviso o time.`,
+      text: `E aí! Sou o assistente do ${BRAND.name}. Pergunte sobre login, lançar gasto, painel ou planos — se eu não souber, aviso o time.`,
     },
   ]);
   const bottomRef = useRef<HTMLDivElement>(null);

@@ -15,10 +15,10 @@ Documento estratégico (sem integração de pagamento nesta versão). Preços pe
 Para o dia a dia:
 
 - Transações e categorias ilimitadas
-- Importação de extrato (CSV/OFX)
 - Contas, renda, recorrentes, dívidas, metas
 - Dashboard (receitas, despesas, saldo, gráficos)
 - SAC / ajuda no app
+- *(Importação de extrato CSV/OFX e conexão bancária: planejadas — ainda não ativas no produto)*
 
 ### Pro — R$ 12,90/mês ou R$ 99/ano
 

@@ -3,8 +3,8 @@ import { expect, test } from "@playwright/test";
 test.describe("smoke", () => {
   test("landing shows brand and CTAs", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText(/ganha/i);
-    await expect(page.getByRole("link", { name: /criar conta grátis/i }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/organizar o dinheiro/i);
+    await expect(page.getByRole("link", { name: /criar minha conta|começar grátis|quero me organizar/i }).first()).toBeVisible();
     await expect(page.getByRole("button", { name: /abrir ajuda/i })).toBeVisible();
   });
 
