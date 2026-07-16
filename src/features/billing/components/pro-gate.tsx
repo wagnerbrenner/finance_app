@@ -7,9 +7,9 @@ type ProGateProps = {
   children?: React.ReactNode;
 };
 
-/** Soft-gate overlay when the user is on Free after trial. */
+/** Soft-gate overlay (rarely shown — expired users are redirected to Assinatura). */
 export function ProGate({
-  title = "Recurso do Te Organiza Pro",
+  title = "Assine o Te Organiza Pro",
   children,
 }: ProGateProps) {
   return (
@@ -23,13 +23,12 @@ export function ProGate({
             {title}
           </p>
           <p className="mt-2 text-sm text-slate-400">
-            Seu {BILLING.trialLabelLong} de degustação terminou. Assine o Pro para continuar com
-            Insights, investimentos avançados e lembretes por e-mail.
+            Seu {BILLING.trialLabelLong} de degustação terminou. Para continuar usando o app, assine
+            o Pro ({BILLING.monthly.display}).
           </p>
-          <p className="mt-3 text-sm text-amber-400">{BILLING.monthly.display}</p>
           <Link href="/app/assinatura" className="mt-5 inline-block">
             <Button className="bg-amber-500 text-slate-950 hover:bg-amber-400">
-              Ver planos e assinar
+              Ir para assinatura
             </Button>
           </Link>
         </div>

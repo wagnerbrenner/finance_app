@@ -63,7 +63,9 @@ export function MarketingLanding() {
               </Button>
             </Link>
             <Link href="/signup">
-              <Button className="bg-cyan-500 text-slate-950 hover:bg-cyan-400">Começar grátis</Button>
+              <Button className="bg-cyan-500 text-slate-950 hover:bg-cyan-400">
+                Mês grátis
+              </Button>
             </Link>
           </div>
         </div>
@@ -105,7 +107,7 @@ export function MarketingLanding() {
                 </Link>
               </div>
               <p className="mt-4 text-xs text-slate-500">
-                {BRAND.tagline} Degustação full · depois o essencial continua grátis.
+                {BRAND.tagline} Um mês pra testar de verdade · depois é assinatura.
               </p>
             </div>
 
@@ -223,18 +225,18 @@ export function MarketingLanding() {
               Um mês inteiro de Pro pra você decidir com calma
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-400 md:text-base">
-              Insights, investimentos e lembretes liberados desde o dia 1 — sem pedir cartão. Se
-              fizer sentido, assina. Se não, o essencial do app continua grátis.
+              Acesso completo desde o dia 1 — sem pedir cartão. Use o mês inteiro. Se fizer sentido,
+              assina e segue. Se não assinar, o app fica pausado até a assinatura.
             </p>
             <ul className="mt-6 grid gap-2 text-sm text-slate-300 sm:grid-cols-3">
               <li className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
-                Full acesso Pro no 1º mês
+                Full acesso no 1º mês
               </li>
               <li className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
                 Sem cartão na degustação
               </li>
               <li className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
-                Cancele a assinatura quando quiser
+                Depois: só com assinatura
               </li>
             </ul>
           </div>
@@ -243,41 +245,23 @@ export function MarketingLanding() {
         {/* Preços */}
         <section id="precos" className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
           <h2 className="text-center font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            Depois da degustação, você escolhe
+            Um mês pra sentir. Depois, assinatura.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-center text-sm text-slate-400">
-            O core fica no Grátis. O Pro é opcional — mensal ou anual ({BILLING.annual.discountNote}
-            ).
+            Não tem plano grátis eterno depois da degustação — assim o produto se sustenta e você
+            decide com um mês real de uso.
           </p>
-          <div className="mx-auto mt-10 grid max-w-3xl gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-[#0B1220]/90 p-6">
-              <h3 className="font-[family-name:var(--font-display)] text-xl font-semibold text-white">
-                Grátis
-              </h3>
-              <p className="mt-1 text-sm text-slate-400">Para o dia a dia do bolso.</p>
-              <p className="mt-4 font-[family-name:var(--font-display)] text-3xl font-semibold text-cyan-300">
-                R$ 0
-              </p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-300">
-                <li>Lançamentos e categorias</li>
-                <li>Contas, renda e recorrentes</li>
-                <li>Dívidas e metas</li>
-                <li>Painel com gráficos</li>
-              </ul>
-              <Link href="/signup" className="mt-6 block">
-                <Button className="w-full bg-cyan-500 text-slate-950 hover:bg-cyan-400">
-                  Começar grátis
-                </Button>
-              </Link>
-            </div>
-            <div className="relative rounded-2xl border border-amber-500/40 bg-[#0B1220]/90 p-6 shadow-[0_0_40px_rgba(245,158,11,0.1)]">
+          <div className="mx-auto mt-10 max-w-lg">
+            <div className="relative rounded-2xl border border-amber-500/40 bg-[#0B1220]/90 p-6 shadow-[0_0_40px_rgba(245,158,11,0.1)] md:p-8">
               <span className="absolute -top-3 right-4 rounded-full bg-amber-500 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-950">
                 1º mês grátis
               </span>
               <h3 className="font-[family-name:var(--font-display)] text-xl font-semibold text-white">
-                Pro
+                Te Organiza Pro
               </h3>
-              <p className="mt-1 text-sm text-slate-400">Insights e o próximo nível.</p>
+              <p className="mt-1 text-sm text-slate-400">
+                Tudo liberado na degustação. Depois cobramos pra continuar.
+              </p>
               <p className="mt-4 font-[family-name:var(--font-display)] text-3xl font-semibold text-amber-400">
                 {BILLING.monthly.display}
               </p>
@@ -286,9 +270,9 @@ export function MarketingLanding() {
                 {BILLING.annual.discountNote})
               </p>
               <ul className="mt-4 space-y-2 text-sm text-slate-300">
-                <li>Tudo do Grátis</li>
+                <li>Lançamentos, painel, contas e recorrentes</li>
                 <li>Insights a partir dos seus gastos</li>
-                <li>Investimentos e lembretes por e-mail</li>
+                <li>Investimentos, dívidas, metas e lembretes</li>
                 <li>Cancele a recorrência quando quiser</li>
               </ul>
               <Link href="/signup" className="mt-6 block">
@@ -296,6 +280,9 @@ export function MarketingLanding() {
                   Começar meu mês grátis
                 </Button>
               </Link>
+              <p className="mt-3 text-center text-[11px] text-slate-500">
+                Sem cartão no 1º mês. Após a degustação, assine para seguir usando.
+              </p>
             </div>
           </div>
         </section>

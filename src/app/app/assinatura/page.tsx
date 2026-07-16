@@ -10,15 +10,20 @@ export default async function AssinaturaPage() {
   const ent = await getEntitlements(userId);
 
   return (
-    <AppShell title="Assinatura">
+    <AppShell title="Assinatura" billingGateExempt>
       <PageHeader
         title="Assinatura"
-        description="Veja seu plano, pagamentos do mês e cancele a recorrência quando quiser."
+        description={
+          ent.hasAppAccess
+            ? "Veja seu plano, pagamentos do mês e cancele a recorrência quando quiser."
+            : "Sua degustação acabou. Assine o Pro para continuar usando o Te Organiza."
+        }
       />
       <AssinaturaClient
         accountTier={ent.accountTier}
         plan={ent.plan}
         reason={ent.reason}
+        hasAppAccess={ent.hasAppAccess}
         trialEndsAt={ent.trialEndsAt?.toISOString() ?? null}
         trialDaysLeft={ent.trialDaysLeft}
         subscription={

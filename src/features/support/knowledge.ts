@@ -192,7 +192,7 @@ export const SUPPORT_INTENTS: SupportIntent[] = [
       "mercado pago",
     ],
     reply:
-      "No cadastro você ganha o primeiro mês de Pro completo (sem cartão) pra degustar. Depois o essencial continua grátis. Pro: R$ 12,90/mês ou R$ 108,36/ano (~30% off), com Insights, investimentos e lembretes. Em Assinatura você vê se pagou o mês, o histórico e pode cancelar a recorrência.",
+      "No cadastro você ganha o primeiro mês completo (sem cartão) pra degustar. Depois desse mês, para continuar é preciso assinar — não tem plano grátis eterno. Pro: R$ 12,90/mês ou R$ 108,36/ano (~30% off). Em Assinatura você vê se pagou o mês, o histórico e cancela a recorrência.",
   },
 ];
 

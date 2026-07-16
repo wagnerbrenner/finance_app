@@ -63,11 +63,11 @@ export function UpgradeModal({ open }: UpgradeModalProps) {
           id="upgrade-title"
           className="mt-2 font-[family-name:var(--font-display)] text-xl font-semibold text-white"
         >
-          Fez sentido? Continue com o Pro
+          Para continuar, assine o Pro
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-slate-400">
-          Você ainda usa o essencial de graça. O Pro mantém Insights, investimentos avançados e
-          lembretes por e-mail.
+          Você já usou o primeiro mês completo. Depois disso o Te Organiza é por assinatura — sem
+          plano gratuito paralelo.
         </p>
         <ul className="mt-4 space-y-1.5 text-sm text-slate-300">
           <li>· {BILLING.monthly.display}</li>
@@ -75,12 +75,12 @@ export function UpgradeModal({ open }: UpgradeModalProps) {
             · {BILLING.annual.display} ({BILLING.annual.monthlyEquivalent} —{" "}
             {BILLING.annual.discountNote})
           </li>
-          <li>· Cancele quando quiser</li>
+          <li>· Cancele a recorrência quando quiser</li>
         </ul>
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
           <Link href="/app/assinatura" className="flex-1" onClick={dismiss}>
             <Button className="w-full bg-amber-500 text-slate-950 hover:bg-amber-400">
-              Ver assinatura
+              Assinar agora
             </Button>
           </Link>
           <Button

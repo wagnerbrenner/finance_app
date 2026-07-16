@@ -17,8 +17,9 @@ type PaymentView = {
 
 type AssinaturaClientProps = {
   accountTier: string;
-  plan: "free" | "pro";
+  plan: "pro" | "locked";
   reason: string;
+  hasAppAccess: boolean;
   trialEndsAt: string | null;
   trialDaysLeft: number | null;
   subscription: {
@@ -88,7 +89,7 @@ export function AssinaturaClient(props: AssinaturaClientProps) {
       return "Pro ativo — cancelamento agendado";
     }
     if (props.reason === "paid") return "Pro ativo";
-    return "Plano Grátis";
+    return "Degustação encerrada — assine para continuar";
   })();
 
   return (

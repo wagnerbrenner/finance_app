@@ -2,10 +2,11 @@
 
 ## Modelo
 
-- **Degustação Pro: primeiro mês** completo sem cartão no signup (`trial_ends_at = created_at + 1 month`).
-- Depois: **Freemium** — core Grátis + Pro opcional.
+- **Degustação:** primeiro mês completo sem cartão (`trial_ends_at = created_at + 1 month`).
+- **Depois:** só com assinatura paga. **Não há freemium / plano grátis eterno.**
+- Sem pagamento após a degustação → app redireciona para `/app/assinatura` (acesso pausado).
 - Gateway: **Mercado Pago** (assinaturas / preapproval + webhooks).
-- Stripe: alternativa futura (Billing SaaS / internacional) — não integrado agora.
+- Contas `account_tier = test` bypassam cobrança.
 
 ## Preços Pro
 
@@ -16,62 +17,32 @@
 
 Constantes em `src/shared/lib/billing.ts`.
 
-## O que cada plano inclui
+## O que a assinatura inclui
 
-### Grátis
-
-- Lançamentos, categorias, contas, renda, recorrentes, dívidas, metas
-- Painel com gráficos
-- SAC no app
-
-### Pro (trial, pago ou `account_tier = test`)
-
-- Tudo do Grátis
-- **Insights** (`/app/insights`)
-- Investimentos avançados
-- Lembretes por e-mail (cron)
-- Futuro: import/conexão bancária
+Tudo o que o app oferece hoje (lançamentos, painel, Insights, investimentos, lembretes, etc.) — liberado na degustação e mantido com Pro ativo.
 
 ## Contas teste
-
-`profiles.account_tier = 'test'` — Pro permanente, sem modal/checkout.
 
 ```bash
 node scripts/set-account-tier.mjs voce@email.com test
 ```
 
-## Gestão da assinatura (app)
+## Gestão (`/app/assinatura`)
 
-Em `/app/assinatura` o usuário vê:
+- Status (degustação / Pro / encerrada)
+- Pagou o ciclo atual? + histórico
+- Assinar mensal/anual · Cancelar recorrência
 
-- Status (trial / Pro / Grátis / cancelamento agendado)
-- Se **pagou o ciclo atual**
-- Histórico de pagamentos
-- Assinar mensal/anual (redirect MP)
-- **Cancelar recorrência** (Pro até `current_period_end`)
+## Env Mercado Pago
 
-## Integração Mercado Pago
+- `MERCADOPAGO_ACCESS_TOKEN`
+- `MERCADOPAGO_WEBHOOK_SECRET` (opcional)
+- `MERCADOPAGO_PREAPPROVAL_PLAN_ID_MONTHLY` / `_ANNUAL` (opcional)
 
-Env:
+Webhook: `https://SEU_DOMINIO/api/billing/webhook`
 
-- `MERCADOPAGO_ACCESS_TOKEN` (obrigatório para checkout)
-- `MERCADOPAGO_WEBHOOK_SECRET` (opcional; query/header)
-- `MERCADOPAGO_PREAPPROVAL_PLAN_ID_MONTHLY` / `_ANNUAL` (opcional; senão usa `auto_recurring` inline)
-
-Rotas:
-
-- `POST /api/billing/checkout` — cria preapproval, retorna `init_point`
-- `POST /api/billing/webhook` — payments + preapproval
-- `POST /api/billing/cancel` — cancela no MP + `cancel_at_period_end`
-
-Webhook no painel MP: `https://SEU_DOMINIO/api/billing/webhook`
-
-## Tabelas
-
-Migration `0009_billing.sql`: `account_tier`, `trial_ends_at`, `subscriptions`, `subscription_payments`, `subscription_events`.
-
-## Legal (antes de cobrar em produção)
+## Legal
 
 - [ ] Privacidade
-- [ ] Termos (cancelamento, renovação)
+- [ ] Termos (cancelamento, renovação, fim da degustação)
 - [ ] CNPJ / dados do prestador no MP

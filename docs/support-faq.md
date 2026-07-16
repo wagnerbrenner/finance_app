@@ -167,16 +167,16 @@ Não. Nunca peça senha do banco, cartão ou app financeiro a ninguém — nem n
 ## Planos e preço
 
 **É grátis?**  
-Sim. Hoje o core do app está liberado para organizar o dia a dia.
-
-**O que vem no Grátis?**  
-Lançamentos, categorias, contas, recorrentes, dívidas, metas, painel com gráficos e ajuda no app.
+Só o **primeiro mês de degustação** (acesso completo, sem cartão). Depois, para continuar, é preciso assinar. Não há plano gratuito eterno.
 
 **O que é o Pro?**  
-R$ 12,90/mês ou R$ 108,36/ano (~30% off): Insights, investimentos, lembretes por e-mail. Primeiro mês de degustação Pro sem cartão no cadastro.
+R$ 12,90/mês ou R$ 108,36/ano (~30% off): o app completo (lançamentos, Insights, investimentos, lembretes, etc.).
+
+**O que acontece se eu não assinar depois do mês?**  
+O acesso fica pausado e o app leva você à tela de Assinatura.
 
 **Como assino ou cancelo?**  
-No app: menu da conta → Assinatura. Lá você vê se pagou o mês, o histórico e cancela a recorrência.
+Menu da conta → Assinatura. Lá você vê se pagou o mês, o histórico e cancela a recorrência.
 
 ---
 

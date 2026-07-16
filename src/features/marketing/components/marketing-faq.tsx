@@ -11,15 +11,15 @@ const FAQS = [
   },
   {
     q: "Como funciona o mês de degustação?",
-    a: "Ao criar a conta você usa o Pro completo sem cartão no primeiro mês (Insights, investimentos, lembretes). Depois o essencial continua grátis e você decide se assina.",
+    a: "Ao criar a conta você usa o app completo por um mês, sem cartão. É pra sentir se faz sentido. Depois desse mês, para continuar é preciso assinar.",
   },
   {
-    q: "É grátis mesmo depois do mês de teste?",
-    a: "Sim. Lançamentos, contas, recorrentes, dívidas, metas e o painel ficam no Grátis. O Pro é opcional.",
+    q: "Depois do mês grátis eu continuo de graça?",
+    a: "Não. Não há plano gratuito eterno depois da degustação. Ou você assina o Pro, ou o acesso fica pausado até a assinatura.",
   },
   {
     q: "Posso cancelar a assinatura?",
-    a: "Sim. Em Assinatura você cancela a recorrência. O Pro continua até o fim do período já pago.",
+    a: "Sim. Em Assinatura você cancela a recorrência. O acesso continua até o fim do período já pago.",
   },
   {
     q: "Funciona no celular?",

@@ -77,25 +77,36 @@ type AppTopbarProps = {
   fullName?: string | null;
   avatarUrl?: string | null;
   planBadge?: string | null;
+  /** Hide launch/nav when tasting ended and user must subscribe. */
+  lockedNav?: boolean;
 };
 
-export function AppTopbar({ title, email, fullName, avatarUrl, planBadge }: AppTopbarProps) {
+export function AppTopbar({
+  title,
+  email,
+  fullName,
+  avatarUrl,
+  planBadge,
+  lockedNav = false,
+}: AppTopbarProps) {
   const setMobileOpen = useUiStore((s) => s.setMobileSidebarOpen);
   const openLaunch = useUiStore((s) => s.openLaunch);
 
   return (
     <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-2 border-b border-border/60 bg-background/80 px-3 backdrop-blur-md sm:gap-3 md:px-6">
       <div className="flex min-w-0 items-center gap-1.5">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          className="md:hidden"
-          onClick={() => setMobileOpen(true)}
-          aria-label="Abrir menu"
-        >
-          <Menu className="size-4" />
-        </Button>
+        {!lockedNav ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="md:hidden"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Abrir menu"
+          >
+            <Menu className="size-4" />
+          </Button>
+        ) : null}
         <h1 className="truncate font-[family-name:var(--font-display)] text-base font-semibold tracking-tight sm:text-lg">
           {title}
         </h1>
@@ -106,24 +117,28 @@ export function AppTopbar({ title, email, fullName, avatarUrl, planBadge }: AppT
         ) : null}
       </div>
       <div className="flex shrink-0 items-center gap-0.5">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          className="md:hidden"
-          onClick={() => openLaunch()}
-          aria-label="Novo lançamento"
-        >
-          <Plus className="size-5 text-teal-400" />
-        </Button>
-        <Button
-          type="button"
-          className="hidden md:inline-flex"
-          onClick={() => openLaunch()}
-        >
-          Novo lançamento
-        </Button>
-        <NotificationsBell />
+        {!lockedNav ? (
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              className="md:hidden"
+              onClick={() => openLaunch()}
+              aria-label="Novo lançamento"
+            >
+              <Plus className="size-5 text-teal-400" />
+            </Button>
+            <Button
+              type="button"
+              className="hidden md:inline-flex"
+              onClick={() => openLaunch()}
+            >
+              Novo lançamento
+            </Button>
+            <NotificationsBell />
+          </>
+        ) : null}
         <UserMenu email={email} fullName={fullName} avatarUrl={avatarUrl} />
       </div>
     </header>

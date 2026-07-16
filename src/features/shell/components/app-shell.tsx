@@ -11,9 +11,15 @@ import { redirect } from "next/navigation";
 type AppShellProps = {
   children: React.ReactNode;
   title: string;
+  /** Assinatura page must stay reachable after tasting ends. */
+  billingGateExempt?: boolean;
 };
 
-export async function AppShell({ children, title }: AppShellProps) {
+export async function AppShell({
+  children,
+  title,
+  billingGateExempt = false,
+}: AppShellProps) {
   const profile = await getCurrentProfile();
 
   if (!profile) {
@@ -22,9 +28,15 @@ export async function AppShell({ children, title }: AppShellProps) {
 
   const entitlements = await getEntitlements(profile.id);
 
+  if (!entitlements.hasAppAccess && !billingGateExempt) {
+    redirect("/app/assinatura");
+  }
+
+  const locked = !entitlements.hasAppAccess;
+
   return (
     <div className="flex min-h-dvh bg-background">
-      <AppSidebar />
+      {!locked ? <AppSidebar /> : null}
       <div className="flex min-w-0 flex-1 flex-col">
         <AppTopbar
           title={title}
@@ -36,18 +48,29 @@ export async function AppShell({ children, title }: AppShellProps) {
               ? `Degustação ${entitlements.trialDaysLeft ?? 0}d`
               : entitlements.accountTier === "test"
                 ? "Teste"
-                : entitlements.plan === "pro"
+                : entitlements.reason === "paid"
                   ? "Pro"
-                  : "Grátis"
+                  : "Assinar"
           }
+          lockedNav={locked}
         />
-        <main className="flex-1 overflow-x-hidden p-3 pb-28 sm:p-4 md:p-6 md:pb-6">
+        <main
+          className={
+            locked
+              ? "flex-1 overflow-x-hidden p-3 sm:p-4 md:p-6"
+              : "flex-1 overflow-x-hidden p-3 pb-28 sm:p-4 md:p-6 md:pb-6"
+          }
+        >
           {children}
         </main>
-        <MobileBottomNav />
-        <LaunchHost />
-        <SupportWidget userEmail={profile.email} />
-        <UpgradeModal open={entitlements.showPaywallModal} />
+        {!locked ? (
+          <>
+            <MobileBottomNav />
+            <LaunchHost />
+            <SupportWidget userEmail={profile.email} />
+          </>
+        ) : null}
+        <UpgradeModal open={entitlements.showPaywallModal && !billingGateExempt} />
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import {
   subscriptions,
 } from "@/server/db/schema";
 
-export type EntitlementReason = "test" | "trial" | "paid" | "none";
+export type EntitlementReason = "test" | "trial" | "paid" | "expired";
 
 export type SubscriptionRow = typeof subscriptions.$inferSelect;
 export type PaymentRow = typeof subscriptionPayments.$inferSelect;
@@ -16,7 +16,9 @@ export type Entitlements = {
   userId: string;
   email: string;
   accountTier: "standard" | "test";
-  plan: "free" | "pro";
+  /** Full app access (trial, paid, or test). After tasting without pay → false. */
+  hasAppAccess: boolean;
+  plan: "pro" | "locked";
   reason: EntitlementReason;
   trialEndsAt: Date | null;
   trialDaysLeft: number | null;
@@ -52,8 +54,9 @@ export async function getEntitlements(userId: string): Promise<Entitlements> {
       userId,
       email: "",
       accountTier: "standard",
-      plan: "free",
-      reason: "none",
+      hasAppAccess: false,
+      plan: "locked",
+      reason: "expired",
       trialEndsAt: null,
       trialDaysLeft: null,
       showPaywallModal: false,
@@ -91,6 +94,7 @@ export async function getEntitlements(userId: string): Promise<Entitlements> {
       userId,
       email: profile.email,
       accountTier,
+      hasAppAccess: true,
       plan: "pro",
       reason: "test",
       trialEndsAt: profile.trialEndsAt,
@@ -107,6 +111,7 @@ export async function getEntitlements(userId: string): Promise<Entitlements> {
       userId,
       email: profile.email,
       accountTier,
+      hasAppAccess: true,
       plan: "pro",
       reason: "paid",
       trialEndsAt: profile.trialEndsAt,
@@ -115,7 +120,8 @@ export async function getEntitlements(userId: string): Promise<Entitlements> {
       subscription: subscription ?? null,
       currentPeriodPaid:
         subscription?.status === "active"
-          ? currentPeriodPaid || Boolean(subscription.currentPeriodEnd && subscription.currentPeriodEnd >= now)
+          ? currentPeriodPaid ||
+            Boolean(subscription.currentPeriodEnd && subscription.currentPeriodEnd >= now)
           : currentPeriodPaid,
       payments,
     };
@@ -130,6 +136,7 @@ export async function getEntitlements(userId: string): Promise<Entitlements> {
       userId,
       email: profile.email,
       accountTier,
+      hasAppAccess: true,
       plan: "pro",
       reason: "trial",
       trialEndsAt,
@@ -145,8 +152,9 @@ export async function getEntitlements(userId: string): Promise<Entitlements> {
     userId,
     email: profile.email,
     accountTier,
-    plan: "free",
-    reason: "none",
+    hasAppAccess: false,
+    plan: "locked",
+    reason: "expired",
     trialEndsAt,
     trialDaysLeft: 0,
     showPaywallModal: true,
@@ -156,6 +164,7 @@ export async function getEntitlements(userId: string): Promise<Entitlements> {
   };
 }
 
+/** Full product during tasting / paid / test. */
 export function hasProAccess(ent: Entitlements): boolean {
-  return ent.plan === "pro";
+  return ent.hasAppAccess;
 }
