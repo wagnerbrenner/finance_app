@@ -28,11 +28,10 @@ export function TcheAuthShell({
       className={cn(
         rowdies.variable,
         nunito.variable,
-        "relative flex min-h-svh overflow-hidden bg-[#0C1F18] text-[#E8F0EB]",
+        "relative flex h-svh max-h-svh overflow-hidden bg-[#0C1F18] text-[#E8F0EB]",
         "font-[family-name:var(--font-tche-body)]",
       )}
     >
-      {/* Campo atmosphere */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -54,58 +53,60 @@ export function TcheAuthShell({
         }}
       />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-6xl flex-1 lg:grid-cols-2">
-        {/* Brand / mascot panel */}
-        <section className="flex flex-col items-center justify-center px-6 pb-4 pt-10 text-center lg:items-start lg:px-12 lg:pb-12 lg:pt-12 lg:text-left">
+      <div className="relative z-10 mx-auto grid h-full w-full max-w-6xl lg:grid-cols-2">
+        {/* Brand / mascot — compact to fit one viewport */}
+        <section className="flex min-h-0 flex-col items-center justify-center gap-2 px-5 py-4 text-center lg:items-start lg:gap-3 lg:px-10 lg:py-6 lg:text-left">
           <Link
             href="/"
-            className="mb-6 inline-flex items-center gap-2.5 self-center lg:self-start"
+            className="inline-flex shrink-0 items-center gap-2 self-center lg:self-start"
           >
             <img
               src="/logo.svg"
               alt=""
-              width={40}
-              height={40}
-              className="size-10 rounded-xl shadow-[0_0_28px_rgba(240,193,74,0.35)]"
+              width={36}
+              height={36}
+              className="size-9 rounded-xl shadow-[0_0_28px_rgba(240,193,74,0.35)]"
             />
-            <span className="font-[family-name:var(--font-tche-display)] text-2xl tracking-wide text-[#F0C14A]">
+            <span className="font-[family-name:var(--font-tche-display)] text-xl tracking-wide text-[#F0C14A] lg:text-2xl">
               {BRAND.name}
             </span>
           </Link>
 
-          <div className="relative mb-4 w-full max-w-[280px] lg:max-w-[360px]">
+          <div className="relative flex min-h-0 w-full max-w-[200px] flex-1 items-center justify-center sm:max-w-[240px] lg:max-w-[280px]">
             <div
               aria-hidden
-              className="absolute -inset-4 rounded-full bg-[radial-gradient(circle,rgba(240,193,74,0.22),transparent_65%)] blur-2xl"
+              className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(240,193,74,0.18),transparent_65%)] blur-2xl"
             />
             <img
               src="/brand/gaucho-mascot.png"
               alt="Gaúcho do Tchê Organiza com dinheiro na mão"
-              width={360}
-              height={360}
-              className="relative mx-auto w-full drop-shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
+              width={280}
+              height={280}
+              className="relative max-h-[min(42svh,280px)] w-auto object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.5)]"
             />
           </div>
 
-          <h1 className="font-[family-name:var(--font-tche-display)] text-3xl leading-tight tracking-wide text-[#E8F0EB] md:text-4xl lg:text-5xl">
-            {BRAND.tagline}
-          </h1>
-          <p className="mt-3 max-w-md text-base text-[#A8C4B8] md:text-lg">
-            {BRAND.shortPitch}
-          </p>
-          <p className="mt-4 font-[family-name:var(--font-tche-display)] text-sm tracking-wider text-[#C43C3C]">
-            ★ organização financeira com sotaque do Sul ★
-          </p>
+          <div className="shrink-0">
+            <h1 className="font-[family-name:var(--font-tche-display)] text-2xl leading-tight tracking-wide text-[#E8F0EB] lg:text-4xl">
+              {BRAND.tagline}
+            </h1>
+            <p className="mt-1.5 max-w-md text-sm text-[#A8C4B8] lg:text-base">
+              {BRAND.shortPitch}
+            </p>
+            <p className="mt-2 hidden font-[family-name:var(--font-tche-display)] text-xs tracking-wider text-[#C43C3C] sm:block">
+              ★ organização financeira com sotaque do Sul ★
+            </p>
+          </div>
         </section>
 
-        {/* Form panel */}
-        <section className="flex items-center justify-center px-4 pb-12 lg:px-10 lg:py-12">
-          <div className="w-full max-w-md rounded-3xl border border-[#1B7A5A]/45 bg-[#102820]/90 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-md sm:p-8">
-            <div className="mb-6">
+        {/* Form */}
+        <section className="flex min-h-0 items-center justify-center overflow-y-auto px-4 py-4 lg:px-8 lg:py-6">
+          <div className="w-full max-w-md rounded-3xl border border-[#1B7A5A]/45 bg-[#102820]/90 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-md sm:p-7">
+            <div className="mb-4">
               <p className="font-[family-name:var(--font-tche-display)] text-xs uppercase tracking-[0.2em] text-[#F0C14A]">
                 {BRAND.greeting}
               </p>
-              <h2 className="mt-1 font-[family-name:var(--font-tche-display)] text-2xl tracking-wide text-[#E8F0EB]">
+              <h2 className="mt-1 font-[family-name:var(--font-tche-display)] text-xl tracking-wide text-[#E8F0EB] sm:text-2xl">
                 {title}
               </h2>
               <p className="mt-1 text-sm text-[#A8C4B8]">{subtitle}</p>
