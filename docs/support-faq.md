@@ -173,10 +173,10 @@ Sim. Hoje o core do app está liberado para organizar o dia a dia.
 Lançamentos, categorias, contas, recorrentes, dívidas, metas, painel com gráficos e ajuda no app.
 
 **O que é o Pro?**  
-Sugestão futura: R$ 12,90/mês ou R$ 99/ano — investimentos avançados, visão de patrimônio, lembretes por e-mail e futuras integrações. **Cobrança ainda não está ativa.**
+R$ 12,90/mês ou R$ 108,36/ano (~30% off): Insights, investimentos, lembretes por e-mail. Primeiro mês de degustação Pro sem cartão no cadastro.
 
-**Já posso pagar?**  
-Ainda não. Crie a conta e use normalmente; quando a assinatura abrir, será pela página de preços.
+**Como assino ou cancelo?**  
+No app: menu da conta → Assinatura. Lá você vê se pagou o mês, o histórico e cancela a recorrência.
 
 ---
 

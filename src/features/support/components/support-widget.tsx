@@ -17,7 +17,8 @@ type SupportWidgetProps = {
 export function SupportWidget({ userEmail }: SupportWidgetProps) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [email, setEmail] = useState(userEmail ?? "");
+  const [emailDraft, setEmailDraft] = useState<string | null>(null);
+  const email = emailDraft ?? userEmail ?? "";
   const [busy, setBusy] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([
     {
@@ -26,10 +27,6 @@ export function SupportWidget({ userEmail }: SupportWidgetProps) {
     },
   ]);
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (userEmail) setEmail(userEmail);
-  }, [userEmail]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -127,7 +124,7 @@ export function SupportWidget({ userEmail }: SupportWidgetProps) {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmailDraft(e.target.value)}
               placeholder="E-mail (se precisar de resposta)"
               className="w-full rounded-lg border border-white/10 bg-black/30 px-2.5 py-1.5 text-xs text-slate-200 placeholder:text-slate-500"
             />

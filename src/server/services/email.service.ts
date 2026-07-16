@@ -6,6 +6,7 @@ import {
   getDueNotifications,
   type FinanceNotification,
 } from "@/server/services/notifications.service";
+import { getEntitlements, hasProAccess } from "@/server/services/entitlements.service";
 import { getSiteUrl } from "@/shared/lib/site-url";
 import { BRAND } from "@/shared/lib/brand";
 import { NOTIFICATION_SEVERITY_LABELS } from "@/shared/lib/labels";
@@ -96,6 +97,8 @@ export async function sendDueReminderEmailsForAllUsers() {
   let sent = 0;
   for (const profile of allProfiles) {
     if (!profile.email) continue;
+    const ent = await getEntitlements(profile.id);
+    if (!hasProAccess(ent)) continue;
     const notifications = await getDueNotifications(profile.id);
     if (notifications.length === 0) continue;
 

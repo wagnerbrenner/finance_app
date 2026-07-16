@@ -10,24 +10,24 @@ const FAQS = [
     a: "Não. Se você recebe e gasta dinheiro, já dá pra usar. O app é em português simples: lançou o gasto, o painel mostra o mês.",
   },
   {
-    q: "É grátis mesmo?",
-    a: "Sim. O essencial está liberado: lançamentos, contas, recorrentes, dívidas, metas e o painel. O plano Pro (quando a cobrança existir) adiciona camadas extras — veja a seção de preços.",
+    q: "Como funciona o mês de degustação?",
+    a: "Ao criar a conta você usa o Pro completo sem cartão no primeiro mês (Insights, investimentos, lembretes). Depois o essencial continua grátis e você decide se assina.",
+  },
+  {
+    q: "É grátis mesmo depois do mês de teste?",
+    a: "Sim. Lançamentos, contas, recorrentes, dívidas, metas e o painel ficam no Grátis. O Pro é opcional.",
+  },
+  {
+    q: "Posso cancelar a assinatura?",
+    a: "Sim. Em Assinatura você cancela a recorrência. O Pro continua até o fim do período já pago.",
   },
   {
     q: "Funciona no celular?",
     a: "Sim. Abra pelo navegador no celular ou no computador. Não precisa baixar nada nas lojas por enquanto.",
   },
   {
-    q: "Vocês conectam no meu banco?",
-    a: "Ainda não. Por enquanto você registra na mão — rápido e sob o seu controle. Integração com banco fica para uma etapa futura; nunca pedimos senha do banco.",
-  },
-  {
     q: "Meus dados ficam seguros?",
     a: "Cada conta só enxerga os próprios registros. Não vendemos dados e não colocamos anúncios no app.",
-  },
-  {
-    q: "Já posso assinar o Pro?",
-    a: "Ainda não. Crie a conta e use normalmente. Quando a assinatura abrir, será pela página de preços.",
   },
 ] as const;
 

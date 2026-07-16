@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BrandLogo, BrandMascot } from "@/shared/components/brand-media";
 import { BRAND } from "@/shared/lib/brand";
+import { BILLING } from "@/shared/lib/billing";
 import { Button } from "@/components/ui/button";
 import { MarketingFaq } from "@/features/marketing/components/marketing-faq";
 import { MarketingDemo } from "@/features/marketing/components/marketing-demo";
@@ -76,17 +77,21 @@ export function MarketingLanding() {
               <p className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-cyan-300 sm:text-4xl md:text-5xl">
                 {BRAND.name}
               </p>
+              <p className="mt-3 inline-flex rounded-full border border-amber-500/35 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-300">
+                {BILLING.trialLabelLong} de Pro grátis · sem cartão
+              </p>
               <h1 className="mt-4 max-w-xl font-[family-name:var(--font-display)] text-3xl font-semibold leading-[1.12] tracking-tight text-white sm:text-4xl md:text-[2.75rem]">
                 Organize o dinheiro sem complicar a vida.
               </h1>
               <p className="mt-5 max-w-lg text-base leading-relaxed text-slate-400 md:text-lg">
-                Anote o que entra e o que sai. Em minutos você enxerga o mês — claro o bastante pra
-                qualquer pessoa usar, do primeiro salário ao freela do fim de semana.
+                Anote o que entra e o que sai. Em minutos você enxerga o mês — e no cadastro ganha o{" "}
+                <span className="text-slate-200">primeiro mês completo de Pro</span> pra sentir se
+                faz sentido assinar.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href="/signup">
                   <Button size="lg" className="bg-amber-500 text-slate-950 hover:bg-amber-400">
-                    Criar minha conta
+                    Quero meu mês grátis
                   </Button>
                 </Link>
                 <Link href="/login">
@@ -99,7 +104,9 @@ export function MarketingLanding() {
                   </Button>
                 </Link>
               </div>
-              <p className="mt-4 text-xs text-slate-500">{BRAND.tagline} Sem cartão pra começar.</p>
+              <p className="mt-4 text-xs text-slate-500">
+                {BRAND.tagline} Degustação full · depois o essencial continua grátis.
+              </p>
             </div>
 
             <div className="relative flex flex-col items-center gap-5">
@@ -206,14 +213,41 @@ export function MarketingLanding() {
           </div>
         </section>
 
+        {/* Degustação */}
+        <section className="mx-auto max-w-6xl px-5 py-12 md:px-8">
+          <div className="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/10 via-[#0B1220] to-cyan-500/10 px-6 py-8 md:px-10 md:py-10">
+            <p className="text-xs font-medium uppercase tracking-wider text-amber-400">
+              Degustação
+            </p>
+            <h2 className="mt-2 max-w-2xl font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight text-white md:text-3xl">
+              Um mês inteiro de Pro pra você decidir com calma
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-400 md:text-base">
+              Insights, investimentos e lembretes liberados desde o dia 1 — sem pedir cartão. Se
+              fizer sentido, assina. Se não, o essencial do app continua grátis.
+            </p>
+            <ul className="mt-6 grid gap-2 text-sm text-slate-300 sm:grid-cols-3">
+              <li className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
+                Full acesso Pro no 1º mês
+              </li>
+              <li className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
+                Sem cartão na degustação
+              </li>
+              <li className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
+                Cancele a assinatura quando quiser
+              </li>
+            </ul>
+          </div>
+        </section>
+
         {/* Preços */}
         <section id="precos" className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
           <h2 className="text-center font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            Comece sem pagar. Evolua se quiser.
+            Depois da degustação, você escolhe
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-center text-sm text-slate-400">
-            O essencial está liberado. O Pro entra quando a cobrança estiver ativa — até lá, organize
-            o bolso com calma.
+            O core fica no Grátis. O Pro é opcional — mensal ou anual ({BILLING.annual.discountNote}
+            ).
           </p>
           <div className="mx-auto mt-10 grid max-w-3xl gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-[#0B1220]/90 p-6">
@@ -236,24 +270,30 @@ export function MarketingLanding() {
                 </Button>
               </Link>
             </div>
-            <div className="rounded-2xl border border-amber-500/40 bg-[#0B1220]/90 p-6 shadow-[0_0_40px_rgba(245,158,11,0.1)]">
+            <div className="relative rounded-2xl border border-amber-500/40 bg-[#0B1220]/90 p-6 shadow-[0_0_40px_rgba(245,158,11,0.1)]">
+              <span className="absolute -top-3 right-4 rounded-full bg-amber-500 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-950">
+                1º mês grátis
+              </span>
               <h3 className="font-[family-name:var(--font-display)] text-xl font-semibold text-white">
                 Pro
               </h3>
-              <p className="mt-1 text-sm text-slate-400">Quando você quiser ir além.</p>
+              <p className="mt-1 text-sm text-slate-400">Insights e o próximo nível.</p>
               <p className="mt-4 font-[family-name:var(--font-display)] text-3xl font-semibold text-amber-400">
-                R$ 12,90<span className="text-base font-normal text-slate-400">/mês</span>
+                {BILLING.monthly.display}
               </p>
-              <p className="text-xs text-slate-500">ou R$ 99/ano (~R$ 8,25/mês)</p>
+              <p className="text-xs text-slate-500">
+                ou {BILLING.annual.display} ({BILLING.annual.monthlyEquivalent} ·{" "}
+                {BILLING.annual.discountNote})
+              </p>
               <ul className="mt-4 space-y-2 text-sm text-slate-300">
                 <li>Tudo do Grátis</li>
-                <li>Investimentos e patrimônio</li>
-                <li>Lembretes por e-mail</li>
-                <li>Futuras conexões com banco</li>
+                <li>Insights a partir dos seus gastos</li>
+                <li>Investimentos e lembretes por e-mail</li>
+                <li>Cancele a recorrência quando quiser</li>
               </ul>
               <Link href="/signup" className="mt-6 block">
                 <Button className="w-full bg-amber-500 text-slate-950 hover:bg-amber-400">
-                  Criar conta (Pro em breve)
+                  Começar meu mês grátis
                 </Button>
               </Link>
             </div>
@@ -274,14 +314,15 @@ export function MarketingLanding() {
         <section className="mx-auto max-w-3xl px-5 py-16 text-center md:px-8 md:pb-24">
           <BrandMascot className="mx-auto mb-6 w-28 opacity-90" />
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            Seu próximo mês pode ficar mais claro.
+            Use um mês de verdade. Depois você decide.
           </h2>
           <p className="mt-3 text-slate-400">
-            Crie a conta, lance o primeiro gasto e veja o painel ganhar vida.
+            Crie a conta, lance o primeiro gasto e aproveite o Pro completo na degustação — sem
+            cartão.
           </p>
           <Link href="/signup" className="mt-8 inline-block">
             <Button size="lg" className="bg-cyan-500 text-slate-950 hover:bg-cyan-400">
-              Quero me organizar
+              Quero meu mês grátis
             </Button>
           </Link>
         </section>

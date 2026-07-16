@@ -2,6 +2,7 @@ import {
   boolean,
   date,
   integer,
+  jsonb,
   numeric,
   pgTable,
   text,
@@ -343,6 +344,57 @@ export const supportMessages = pgTable("support_messages", {
   message: text("message").notNull(),
   matchedIntent: text("matched_intent"),
   status: text("status").notNull().default("open"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+    .defaultNow()
+    .notNull(),
+});
+
+export const subscriptions = pgTable("subscriptions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
+  provider: text("provider").notNull().default("mercadopago"),
+  externalId: text("external_id"),
+  plan: text("plan").notNull(),
+  status: text("status").notNull().default("pending"),
+  currentPeriodStart: timestamp("current_period_start", {
+    withTimezone: true,
+    mode: "date",
+  }),
+  currentPeriodEnd: timestamp("current_period_end", {
+    withTimezone: true,
+    mode: "date",
+  }),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+  canceledAt: timestamp("canceled_at", { withTimezone: true, mode: "date" }),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+    .defaultNow()
+    .notNull(),
+});
+
+export const subscriptionPayments = pgTable("subscription_payments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  subscriptionId: uuid("subscription_id").notNull(),
+  externalPaymentId: text("external_payment_id"),
+  amount: numeric("amount", { precision: 14, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("BRL"),
+  status: text("status").notNull(),
+  paidAt: timestamp("paid_at", { withTimezone: true, mode: "date" }),
+  periodLabel: text("period_label"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+    .defaultNow()
+    .notNull(),
+});
+
+export const subscriptionEvents = pgTable("subscription_events", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  provider: text("provider").notNull().default("mercadopago"),
+  eventId: text("event_id"),
+  topic: text("topic"),
+  payload: jsonb("payload").notNull(),
+  processedAt: timestamp("processed_at", { withTimezone: true, mode: "date" }),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
     .defaultNow()
     .notNull(),

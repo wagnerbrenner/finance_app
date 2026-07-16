@@ -8,6 +8,7 @@ import {
   TrendingUp,
   Banknote,
   RefreshCw,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 
@@ -33,6 +34,7 @@ export const SECONDARY_NAV: NavItem[] = [
   { title: "Dívidas", href: "/app/dividas", icon: Landmark, enabled: true },
   { title: "Metas", href: "/app/metas", icon: Target, enabled: true },
   { title: "Investimentos", href: "/app/investimentos", icon: TrendingUp, enabled: true },
+  { title: "Insights", href: "/app/insights", icon: Sparkles, enabled: true },
 ];
 
 /** Lista completa da sidebar (Importar oculto). */

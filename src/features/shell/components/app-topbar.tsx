@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOut, Menu, Plus, UserRound } from "lucide-react";
+import Link from "next/link";
+import { CreditCard, LogOut, Menu, Plus, UserRound } from "lucide-react";
 import { signOut } from "@/features/auth/actions";
 import { useUiStore } from "@/shared/stores/ui-store";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { NotificationsBell } from "@/features/notifications/components/notifications-bell";
 
 type UserMenuProps = {
@@ -52,6 +54,10 @@ export function UserMenu({ email, fullName, avatarUrl }: UserMenuProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem render={<Link href="/app/assinatura" />}>
+          <CreditCard className="size-4" />
+          Assinatura
+        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
             void signOut();
@@ -70,9 +76,10 @@ type AppTopbarProps = {
   email: string;
   fullName?: string | null;
   avatarUrl?: string | null;
+  planBadge?: string | null;
 };
 
-export function AppTopbar({ title, email, fullName, avatarUrl }: AppTopbarProps) {
+export function AppTopbar({ title, email, fullName, avatarUrl, planBadge }: AppTopbarProps) {
   const setMobileOpen = useUiStore((s) => s.setMobileSidebarOpen);
   const openLaunch = useUiStore((s) => s.openLaunch);
 
@@ -92,6 +99,11 @@ export function AppTopbar({ title, email, fullName, avatarUrl }: AppTopbarProps)
         <h1 className="truncate font-[family-name:var(--font-display)] text-base font-semibold tracking-tight sm:text-lg">
           {title}
         </h1>
+        {planBadge ? (
+          <Badge variant="secondary" className="hidden shrink-0 text-[10px] sm:inline-flex">
+            {planBadge}
+          </Badge>
+        ) : null}
       </div>
       <div className="flex shrink-0 items-center gap-0.5">
         <Button

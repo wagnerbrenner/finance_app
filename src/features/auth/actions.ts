@@ -185,6 +185,8 @@ export const getCurrentProfile = cache(async () => {
     avatarUrl: (user.user_metadata?.avatar_url as string | undefined) ?? null,
     locale: "pt-BR",
     currency: "BRL",
+    accountTier: "standard",
+    trialEndsAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null,

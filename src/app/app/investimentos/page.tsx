@@ -23,6 +23,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ProGate } from "@/features/billing/components/pro-gate";
+import { getEntitlements, hasProAccess } from "@/server/services/entitlements.service";
 
 const investmentTypeOptions = [
   { value: "tesouro", label: "Tesouro" },
@@ -197,6 +199,9 @@ function consortiumFields(row?: {
 
 export default async function InvestmentsPage() {
   const userId = await requireUserId();
+  const ent = await getEntitlements(userId);
+  const pro = hasProAccess(ent);
+
   const [rows, consortiumRows] = await Promise.all([
     db
       .select()
@@ -214,8 +219,7 @@ export default async function InvestmentsPage() {
     0,
   );
 
-  return (
-    <AppShell title="Investimentos">
+  const body = (
       <div className="space-y-6">
         <PageHeader title="Investimentos" description={formatBRL(total)} />
         <Tabs defaultValue="portfolio">
@@ -364,6 +368,15 @@ export default async function InvestmentsPage() {
           </TabsContent>
         </Tabs>
       </div>
+  );
+
+  return (
+    <AppShell title="Investimentos">
+      {pro ? (
+        body
+      ) : (
+        <ProGate title="Investimentos avançados no Pro">{body}</ProGate>
+      )}
     </AppShell>
   );
 }

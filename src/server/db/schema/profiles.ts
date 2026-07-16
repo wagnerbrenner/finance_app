@@ -11,6 +11,8 @@ export const profiles = pgTable("profiles", {
   avatarUrl: text("avatar_url"),
   locale: text("locale").notNull().default("pt-BR"),
   currency: text("currency").notNull().default("BRL"),
+  accountTier: text("account_tier").notNull().default("standard"),
+  trialEndsAt: timestamp("trial_ends_at", { withTimezone: true, mode: "date" }),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
     .defaultNow()
     .notNull(),

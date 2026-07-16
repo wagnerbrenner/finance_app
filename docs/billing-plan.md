@@ -1,104 +1,77 @@
 # Plano de cobrança — Te Organiza
 
-Documento estratégico (sem integração de pagamento nesta versão). Preços pensados para ser acessíveis e competitivos frente a produtos como [Planilha by UdinePay](https://planilha.udinepay.com/) (Pro ~R$ 14,90/mês).
+## Modelo
 
-## Posicionamento
+- **Degustação Pro: primeiro mês** completo sem cartão no signup (`trial_ends_at = created_at + 1 month`).
+- Depois: **Freemium** — core Grátis + Pro opcional.
+- Gateway: **Mercado Pago** (assinaturas / preapproval + webhooks).
+- Stripe: alternativa futura (Billing SaaS / internacional) — não integrado agora.
 
-- **Grátis forte** para adquirir usuários e gerar hábito.
-- **Pro acessível** um pouco abaixo do mercado (~R$ 12,90/mês) para converter quem quer patrimônio/investimentos e lembretes.
-- Trial curto **sem cartão** (3–7 dias do Pro) quando o checkout existir — reduz fricção.
+## Preços Pro
 
-## Planos sugeridos
+| Ciclo | Valor | Equivalente |
+|-------|-------|-------------|
+| Mensal | R$ 12,90/mês | — |
+| Anual | R$ 108,36/ano | ~R$ 9,03/mês (**~30% off**) |
 
-### Grátis — R$ 0
+Constantes em `src/shared/lib/billing.ts`.
 
-Para o dia a dia:
+## O que cada plano inclui
 
-- Transações e categorias ilimitadas
-- Contas, renda, recorrentes, dívidas, metas
-- Dashboard (receitas, despesas, saldo, gráficos)
-- SAC / ajuda no app
-- *(Importação de extrato CSV/OFX e conexão bancária: planejadas — ainda não ativas no produto)*
+### Grátis
 
-### Pro — R$ 12,90/mês ou R$ 99/ano
+- Lançamentos, categorias, contas, renda, recorrentes, dívidas, metas
+- Painel com gráficos
+- SAC no app
 
-Equivale a ~R$ 8,25/mês no anual (desconto ~36%).
+### Pro (trial, pago ou `account_tier = test`)
 
-Tudo do Grátis, mais:
+- Tudo do Grátis
+- **Insights** (`/app/insights`)
+- Investimentos avançados
+- Lembretes por e-mail (cron)
+- Futuro: import/conexão bancária
 
-- Investimentos: carteira, aportes e alocação
-- Visão de patrimônio (bens + dívidas + evolução)
-- Lembretes por e-mail de vencimentos (volume maior / prioridade)
-- Futuro: sync Open Finance / agregadores (quando houver custo de provedor coberto pela assinatura)
-- Futuro: calculadoras (juros, reserva, independência)
+## Contas teste
 
-**Por que esses valores**
+`profiles.account_tier = 'test'` — Pro permanente, sem modal/checkout.
 
-| Critério | Decisão |
-|----------|---------|
-| Ticket baixo | Facilita “testar sem pensar” |
-| Anual com desconto | Melhora LTV e previsibilidade |
-| Grátis completo no core | Evita muro de paywall cedo demais |
+```bash
+node scripts/set-account-tier.mjs voce@email.com test
+```
 
-## O que fica no Grátis vs Pro (produto atual)
+## Gestão da assinatura (app)
 
-Hoje o app já expõe investimentos e várias áreas sem gate. Antes de cobrar de verdade:
+Em `/app/assinatura` o usuário vê:
 
-1. Definir feature flags (`plan = free | pro`)
-2. Soft-gate no Pro (mostrar UI + CTA “Assinar”) ou hard-gate
-3. Migrar usuários early-adopter com grace period
+- Status (trial / Pro / Grátis / cancelamento agendado)
+- Se **pagou o ciclo atual**
+- Histórico de pagamentos
+- Assinar mensal/anual (redirect MP)
+- **Cancelar recorrência** (Pro até `current_period_end`)
 
-## Fluxo futuro — Mercado Pago (assinatura cartão)
+## Integração Mercado Pago
 
-### Modelo recomendado
+Env:
 
-1. **Checkout próprio + Preference / Assinaturas Mercado Pago** (ou Checkout Pro com recorrência).
-2. Usuário escolhe Mensal ou Anual na página `/precos` (ou modal).
-3. Redireciona / embute checkout MP com cartão.
-4. Webhook MP → API Te Organiza atualiza `subscriptions`.
-5. App lê `subscriptions.status` para liberar Pro.
+- `MERCADOPAGO_ACCESS_TOKEN` (obrigatório para checkout)
+- `MERCADOPAGO_WEBHOOK_SECRET` (opcional; query/header)
+- `MERCADOPAGO_PREAPPROVAL_PLAN_ID_MONTHLY` / `_ANNUAL` (opcional; senão usa `auto_recurring` inline)
 
-### Eventos / webhooks a tratar
+Rotas:
 
-- `subscription_authorized` / pagamento aprovado → `active`
-- `payment` rejected / overdue → `past_due` + e-mail
-- cancelamento → `canceled` no fim do período pago
+- `POST /api/billing/checkout` — cria preapproval, retorna `init_point`
+- `POST /api/billing/webhook` — payments + preapproval
+- `POST /api/billing/cancel` — cancela no MP + `cancel_at_period_end`
 
-### Tabelas sugeridas (futuro)
+Webhook no painel MP: `https://SEU_DOMINIO/api/billing/webhook`
 
-- `subscriptions`: user_id, mp_subscription_id, plan (`monthly`|`annual`), status, current_period_end, created_at
-- `subscription_events`: payload bruto do webhook (auditoria)
+## Tabelas
 
-### Trial sem cartão
+Migration `0009_billing.sql`: `account_tier`, `trial_ends_at`, `subscriptions`, `subscription_payments`, `subscription_events`.
 
-- Ao signup: `trial_ends_at = now() + 3 days`, `plan_effective = pro`
-- Depois do trial: volta a `free` até assinar
-- Não exigir cartão no trial (conversão honest + LGPD-friendly)
+## Legal (antes de cobrar em produção)
 
-### Segurança
-
-- Validar assinatura do webhook MP
-- Nunca confiar só no client
-- Idempotência por `payment_id` / `event_id`
-
-## Checklist legal antes de cobrar
-
-- [ ] Página Privacidade
-- [ ] Página Termos de uso (cancelamento, renovação, reembolso)
-- [ ] CNPJ / dados do prestador no checkout
-- [ ] Política clara de cancelamento (“cancele quando quiser”)
-
-## Fora de escopo agora
-
-- SDK Mercado Pago
-- Webhooks
-- UI de cartão / checkout real
-- Feature flags de plano no código
-
-## Próximo passo de produto (quando for implementar)
-
-1. Conta Mercado Pago + credenciais de teste
-2. Migration `subscriptions`
-3. `POST /api/billing/checkout` + `POST /api/billing/webhook`
-4. Página preços com CTAs reais
-5. Gates no app (investimentos / patrimônio / e-mail reminders volume)
+- [ ] Privacidade
+- [ ] Termos (cancelamento, renovação)
+- [ ] CNPJ / dados do prestador no MP

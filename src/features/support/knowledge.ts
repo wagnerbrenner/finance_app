@@ -192,7 +192,7 @@ export const SUPPORT_INTENTS: SupportIntent[] = [
       "mercado pago",
     ],
     reply:
-      "Hoje o core está liberado: lançamentos, categorias, contas, recorrentes, dívidas, metas e painel. O Pro sugerido é R$ 12,90/mês ou R$ 99/ano (investimentos avançados, patrimônio, lembretes). A cobrança ainda não está ativa — quando estiver, você assina na página de preços.",
+      "No cadastro você ganha o primeiro mês de Pro completo (sem cartão) pra degustar. Depois o essencial continua grátis. Pro: R$ 12,90/mês ou R$ 108,36/ano (~30% off), com Insights, investimentos e lembretes. Em Assinatura você vê se pagou o mês, o histórico e pode cancelar a recorrência.",
   },
 ];
 

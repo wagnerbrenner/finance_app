@@ -5,7 +5,7 @@ test.describe("smoke", () => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/organizar o dinheiro/i);
     await expect(
-      page.getByRole("link", { name: /criar minha conta|começar grátis|quero me organizar/i }).first(),
+      page.getByRole("link", { name: /mês grátis|começar grátis|criar conta/i }).first(),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: /abrir ajuda/i })).toHaveCount(0);
   });

@@ -3,7 +3,9 @@ import { AppTopbar } from "@/features/shell/components/app-topbar";
 import { MobileBottomNav } from "@/features/shell/components/mobile-bottom-nav";
 import { LaunchHost } from "@/features/shell/components/launch-host";
 import { SupportWidget } from "@/features/support/components/support-widget";
+import { UpgradeModal } from "@/features/billing/components/upgrade-modal";
 import { getCurrentProfile } from "@/features/auth/actions";
+import { getEntitlements } from "@/server/services/entitlements.service";
 import { redirect } from "next/navigation";
 
 type AppShellProps = {
@@ -18,6 +20,8 @@ export async function AppShell({ children, title }: AppShellProps) {
     redirect("/login");
   }
 
+  const entitlements = await getEntitlements(profile.id);
+
   return (
     <div className="flex min-h-dvh bg-background">
       <AppSidebar />
@@ -27,6 +31,15 @@ export async function AppShell({ children, title }: AppShellProps) {
           email={profile.email}
           fullName={profile.fullName}
           avatarUrl={profile.avatarUrl}
+          planBadge={
+            entitlements.reason === "trial"
+              ? `Degustação ${entitlements.trialDaysLeft ?? 0}d`
+              : entitlements.accountTier === "test"
+                ? "Teste"
+                : entitlements.plan === "pro"
+                  ? "Pro"
+                  : "Grátis"
+          }
         />
         <main className="flex-1 overflow-x-hidden p-3 pb-28 sm:p-4 md:p-6 md:pb-6">
           {children}
@@ -34,6 +47,7 @@ export async function AppShell({ children, title }: AppShellProps) {
         <MobileBottomNav />
         <LaunchHost />
         <SupportWidget userEmail={profile.email} />
+        <UpgradeModal open={entitlements.showPaywallModal} />
       </div>
     </div>
   );
