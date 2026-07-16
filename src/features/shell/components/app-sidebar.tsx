@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 import { PanelLeftClose, PanelLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/features/shell/nav-items";
 import { useUiStore } from "@/shared/stores/ui-store";
 import { BRAND } from "@/shared/lib/brand";
+import { BrandLogo } from "@/shared/components/brand-media";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -23,13 +23,7 @@ function Brand({ collapsed }: { collapsed?: boolean }) {
       className={cn("flex items-center gap-2.5", collapsed ? "justify-center" : "px-2")}
       title={collapsed ? BRAND.name : undefined}
     >
-      <img
-        src="/logo.svg"
-        alt=""
-        width={32}
-        height={32}
-        className="size-8 shrink-0 rounded-md"
-      />
+      <BrandLogo size={32} className="size-8 shrink-0" />
       {!collapsed ? (
         <span className="font-[family-name:var(--font-display)] text-base font-semibold tracking-tight">
           {BRAND.name}
@@ -84,11 +78,7 @@ function NavList({
             )}
           >
             {active ? (
-              <motion.span
-                layoutId="nav-active"
-                className="absolute inset-0 rounded-lg bg-muted"
-                transition={{ type: "spring", stiffness: 380, damping: 30 }}
-              />
+              <span className="absolute inset-0 rounded-lg bg-muted" aria-hidden />
             ) : null}
             <Icon className="relative z-10 size-4 shrink-0" />
             {!collapsed ? (

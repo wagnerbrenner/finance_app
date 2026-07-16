@@ -9,11 +9,7 @@ import { db } from "@/server/db";
 import { getDashboard } from "@/server/services/dashboard.service";
 import { getDueNotifications } from "@/server/services/notifications.service";
 import { formatBRL } from "@/shared/lib/formatters";
-import { CashFlowChart } from "@/features/dashboard/components/cash-flow-chart";
-import {
-  CategoryExpenseChart,
-  IncomeExpenseChart,
-} from "@/features/dashboard/components/expense-charts";
+import { CashFlowChartLazy, CategoryExpenseChart, IncomeExpenseChart } from "@/features/dashboard/components/charts-lazy";
 import { DueAlertsBanner } from "@/features/notifications/components/due-alerts-banner";
 import { cn } from "@/lib/utils";
 
@@ -23,16 +19,17 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
   const userId = await requireUserId();
-  try {
-    await db.execute(sql`select public.seed_default_categories(${userId})`);
-  } catch (err) {
-    console.error("seed_default_categories failed", err);
-  }
+  const seedPromise = db
+    .execute(sql`select public.seed_default_categories(${userId})`)
+    .catch((err) => {
+      console.error("seed_default_categories failed", err);
+    });
 
   const [dashboard, notifications] = await Promise.all([
     getDashboard(userId),
     getDueNotifications(userId),
-  ]);
+    seedPromise,
+  ]).then(([d, n]) => [d, n] as const);
   const { kpis } = dashboard;
   const savingsPct = Math.round(kpis.savingsRate * 100);
   const monthBalance = kpis.month.income - kpis.month.expense;
@@ -102,7 +99,7 @@ export default async function DashboardPage() {
               <CardTitle>Fluxo de caixa</CardTitle>
             </CardHeader>
             <CardContent>
-              <CashFlowChart data={dashboard.cashFlow} meta={dashboard.cashFlowMeta} />
+              <CashFlowChartLazy data={dashboard.cashFlow} meta={dashboard.cashFlowMeta} />
             </CardContent>
           </Card>
           <Card>

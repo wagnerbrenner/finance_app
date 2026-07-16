@@ -1,23 +1,11 @@
 import Link from "next/link";
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/shared/lib/brand";
-
-const space = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-te-display",
-});
-
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-te-mono",
-});
+import { BrandLogo, BrandMascot } from "@/shared/components/brand-media";
 
 export default function HomePage() {
   return (
-    <div
-      className={`${space.variable} ${mono.variable} relative flex min-h-svh flex-col overflow-hidden bg-[#070B14] font-[family-name:var(--font-te-display)] text-[#E8EEF7]`}
-    >
+    <div className="relative flex min-h-svh flex-col overflow-hidden bg-[#070B14] font-sans text-[#E8EEF7]">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -40,8 +28,8 @@ export default function HomePage() {
       />
 
       <header className="relative z-10 flex items-center justify-between px-6 py-5 md:px-10">
-        <span className="flex items-center gap-2.5 text-lg font-semibold tracking-tight text-cyan-300">
-          <img src="/logo.svg" alt="" width={28} height={28} className="size-7 rounded-md" />
+        <span className="flex items-center gap-2.5 font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight text-cyan-300">
+          <BrandLogo size={28} priority className="size-7" />
           {BRAND.name}
         </span>
         <div className="flex items-center gap-2">
@@ -58,10 +46,10 @@ export default function HomePage() {
 
       <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-8 px-6 pb-16 pt-4 md:flex-row md:gap-10 md:px-10">
         <div className="max-w-lg text-center md:text-left">
-          <p className="mb-3 font-[family-name:var(--font-te-mono)] text-xs tracking-wide text-amber-400">
+          <p className="mb-3 font-[family-name:var(--font-mono)] text-xs tracking-wide text-amber-400">
             {"// gestão financeira pessoal"}
           </p>
-          <h1 className="text-5xl font-semibold leading-[0.95] tracking-tight text-white md:text-6xl">
+          <h1 className="font-[family-name:var(--font-display)] text-5xl font-semibold leading-[0.95] tracking-tight text-white md:text-6xl">
             {BRAND.name}
           </h1>
           <p className="mt-4 text-xl text-cyan-300 md:text-2xl">{BRAND.tagline}</p>
@@ -83,12 +71,9 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-        <img
-          src="/brand/nerd-mascot.png"
-          alt="Mascote do Te Organiza"
-          width={280}
-          height={340}
-          className="h-auto w-44 object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.55)] sm:w-52 md:w-64"
+        <BrandMascot
+          priority
+          className="w-44 drop-shadow-[0_24px_48px_rgba(0,0,0,0.55)] sm:w-52 md:w-64"
         />
       </main>
     </div>
