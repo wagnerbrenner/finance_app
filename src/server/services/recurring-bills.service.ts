@@ -159,12 +159,16 @@ export async function ensureUpcomingOccurrences(userId: string) {
   }
 
   if (toInsert.length > 0) {
-    await db
-      .insert(recurringBillOccurrences)
-      .values(toInsert)
-      .onConflictDoNothing({
-        target: [recurringBillOccurrences.billId, recurringBillOccurrences.dueDate],
-      });
+    try {
+      await db
+        .insert(recurringBillOccurrences)
+        .values(toInsert)
+        .onConflictDoNothing({
+          target: [recurringBillOccurrences.billId, recurringBillOccurrences.dueDate],
+        });
+    } catch (err) {
+      console.error("ensureUpcomingOccurrences insert failed", err);
+    }
   }
 }
 

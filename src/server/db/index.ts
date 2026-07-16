@@ -18,27 +18,29 @@ function createDb(): Db {
     );
   }
 
+  // Reuse across hot reloads / serverless invocations in the same isolate.
+  // Creating a new pool per query exhausts Supabase (EMAXCONN).
   const client =
     globalForDb.pg ??
     postgres(connectionString, {
       prepare: false,
-      max: 10,
+      // Serverless: keep the pool tiny; prefer Supabase pooler URL (6543).
+      max: process.env.NODE_ENV === "production" ? 1 : 5,
+      idle_timeout: 20,
+      max_lifetime: 60 * 5,
     });
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForDb.pg = client;
-  }
+  globalForDb.pg = client;
 
   return drizzle(client, { schema });
 }
 
 export const db: Db = new Proxy({} as Db, {
   get(_target, prop, receiver) {
-    const instance = globalForDb.db ?? createDb();
-    if (process.env.NODE_ENV !== "production") {
-      globalForDb.db = instance;
+    if (!globalForDb.db) {
+      globalForDb.db = createDb();
     }
-    return Reflect.get(instance, prop, receiver);
+    return Reflect.get(globalForDb.db, prop, receiver);
   },
 });
 

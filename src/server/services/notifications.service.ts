@@ -76,8 +76,12 @@ export async function getDueNotifications(
   options?: { skipEnsure?: boolean },
 ): Promise<FinanceNotification[]> {
   if (!options?.skipEnsure) {
-    await ensureUpcomingOccurrences(userId);
-    await markDueOccurrences(userId);
+    try {
+      await ensureUpcomingOccurrences(userId);
+      await markDueOccurrences(userId);
+    } catch (err) {
+      console.error("getDueNotifications ensure failed", err);
+    }
   }
 
   const today = format(new Date(), "yyyy-MM-dd");
