@@ -67,7 +67,11 @@ export async function AppShell({
           <>
             <MobileBottomNav />
             <LaunchHost />
-            <SupportWidget userEmail={profile.email} />
+            <SupportWidget
+              userEmail={profile.email}
+              userId={profile.id}
+              userName={profile.fullName}
+            />
           </>
         ) : null}
         <UpgradeModal open={entitlements.showPaywallModal && !billingGateExempt} />

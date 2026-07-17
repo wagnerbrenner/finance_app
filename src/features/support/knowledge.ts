@@ -1,73 +1,53 @@
 export type SupportIntent = {
   id: string;
+  /** Frases longas pontuam mais. */
+  phrases?: string[];
   keywords: string[];
   reply: string;
+  /** Abre o card de sugestão no widget. */
+  openFeedback?: boolean;
 };
 
 /**
- * FAQ / knowledge base — zero LLM cost.
- * Fonte humana: docs/support-faq.md (manter alinhado).
+ * FAQ do chat (usuário já logado) — só funcionalidade.
+ * Fonte: docs/support-faq.md
  */
 export const SUPPORT_INTENTS: SupportIntent[] = [
   {
     id: "greeting",
     keywords: ["oi", "olá", "ola", "eai", "e aí", "bom dia", "boa tarde", "boa noite", "hey", "ajuda"],
     reply:
-      "E aí! Sou o assistente do Te Organiza. Posso explicar login, lançamentos, painel, contas, recorrentes, metas, dívidas, planos e privacidade. O que você precisa?",
+      "E aí! Posso te ajudar com o app: lançar gasto, painel, recorrentes, metas, dívidas, Insights, assinatura… Ou manda uma sugestão de melhoria. O que você precisa?",
   },
   {
-    id: "what_is",
+    id: "feedback",
+    phrases: ["sugerir melhoria", "sugestao de melhoria", "ideia de melhoria"],
     keywords: [
-      "o que é",
-      "oque e",
-      "para que serve",
-      "pra que serve",
-      "como funciona o app",
-      "te organiza",
-      "o que faz",
+      "sugestão",
+      "sugestao",
+      "melhoria",
+      "seria legal",
+      "podia ter",
+      "poderia ter",
+      "feature",
+      "ideia",
+      "reclamação",
+      "reclamacao",
+      "feedback",
     ],
     reply:
-      "O Te Organiza é um app web de finanças pessoais: você registra o que ganha e o que gasta, vê o mês em gráficos e acompanha contas, dívidas, metas e investimentos. Funciona no celular e no computador, sem instalar nada. Frase da casa: suas finanças, no controle.",
-  },
-  {
-    id: "signup_login",
-    keywords: [
-      "criar conta",
-      "cadastro",
-      "signup",
-      "entrar",
-      "login",
-      "senha",
-      "esqueci",
-      "confirmar email",
-      "confirmar e-mail",
-      "confirmação",
-      "reenviar",
-      "não recebi",
-      "nao recebi",
-    ],
-    reply:
-      "Criar conta: use “Criar conta” na home e confirme o e-mail. Entrar: /login com e-mail e senha. Se o e-mail de confirmação não chegou, olhe o spam e use “Reenviar e-mail de confirmação” no login. Recuperação de senha também começa pela tela de login (link por e-mail).",
-  },
-  {
-    id: "import_coming",
-    keywords: [
-      "importar",
-      "csv",
-      "ofx",
-      "extrato",
-      "nubank",
-      "open finance",
-      "conectar banco",
-      "sincronizar",
-      "integração bancária",
-      "integracao bancaria",
-    ],
-    reply:
-      "A importação automática de extrato (CSV, Nubank ou outros bancos) ainda não está liberada. Por enquanto registre gastos e receitas pelo botão + Lançar. Quando a importação estiver pronta, avisamos — não pedimos senha do banco em nenhum momento.",
+      "Boa! Abre o card de sugestão abaixo, descreve a ideia com clareza e envia — chega no e-mail do time.",
+    openFeedback: true,
   },
   {
     id: "transactions",
+    phrases: [
+      "como lancar",
+      "como lanço",
+      "como registrar gasto",
+      "adicionar despesa",
+      "novo lancamento",
+    ],
     keywords: [
       "lançar",
       "lancar",
@@ -77,15 +57,15 @@ export const SUPPORT_INTENTS: SupportIntent[] = [
       "despesa",
       "receita",
       "registrar",
-      "adicionar gasto",
-      "como lanço",
-      "como lanco",
+      "editar lancamento",
+      "excluir gasto",
     ],
     reply:
-      "Use o botão + (Lançar) na barra superior ou no atalho do celular: valor, data, categoria e conta. Receitas também entram por ali ou pela área Renda. Em Transações você vê, edita ou exclui o que já lançou.",
+      "Toque em + / Novo lançamento (barra superior ou atalho no celular): valor, data, categoria e conta. Em Transações você vê a lista, edita ou exclui. Receitas também entram por Renda.",
   },
   {
     id: "dashboard",
+    phrases: ["saldo do mes", "nao bate", "grafico vazio", "como funciona o painel"],
     keywords: [
       "dashboard",
       "painel",
@@ -95,104 +75,100 @@ export const SUPPORT_INTENTS: SupportIntent[] = [
       "gráfico",
       "grafico",
       "categoria",
-      "não bate",
-      "nao bate",
-      "vazio",
+      "fluxo",
     ],
     reply:
-      "No Painel aparecem Receitas do mês, Despesas do mês, Saldo do mês, fluxo de caixa e gastos por categoria — tudo a partir do que você lançou no mês atual. Se o número não bater com o banco, falta lançamento ou a data está em outro mês. Gráfico vazio = ainda sem lançamentos no mês.",
+      "No Painel: Receitas, Despesas e Saldo do mês + gráficos — tudo do que você lançou no mês atual. Se não bater com o banco, falta lançamento ou a data está em outro mês. Sem lançamentos = gráfico vazio.",
   },
   {
     id: "accounts",
     keywords: ["conta", "contas", "carteira", "poupança", "poupanca", "corrente"],
     reply:
-      "Em Contas você cadastra onde o dinheiro “mora” (corrente, poupança, carteira…). Os lançamentos se ligam a uma conta. Pode começar com uma só e ir adicionando depois.",
+      "Em Contas você cadastra onde o dinheiro “mora” (corrente, poupança, carteira). Cada lançamento se liga a uma conta. Pode começar com uma só.",
   },
   {
     id: "recurring",
-    keywords: [
-      "recorrente",
-      "recorrentes",
-      "fix",
-      "salário",
-      "salario",
-      "assinatura",
-      "aluguel",
-      "vencimento",
-    ],
+    phrases: ["marcar como pago", "conta fixa", "gasto fixo"],
+    keywords: ["recorrente", "recorrentes", "fix", "aluguel", "vencimento", "streaming"],
     reply:
-      "Em Recorrentes você cadastra o que se repete (salário, aluguel, assinaturas). Acompanhe as ocorrências por vencimento e marque como pago quando pagar na vida real.",
+      "Em Recorrentes cadastre o que se repete (aluguel, streaming, salário). Acompanhe as ocorrências do mês e marque como pago quando pagar na vida real.",
   },
   {
     id: "cards",
     keywords: ["cartão", "cartao", "cartões", "cartoes", "crédito", "credito", "fatura"],
     reply:
-      "Em Cartões você cadastra cartões de crédito e o que registrou ligado a eles. O app não conecta sozinho ao banco nem baixa a fatura automaticamente.",
+      "Em Cartões você cadastra cartões e o que registrou neles. O app não baixa fatura do banco sozinho — o lançamento é manual.",
   },
   {
-    id: "debts_goals",
-    keywords: ["dívida", "divida", "dívidas", "dividas", "meta", "metas", "aporte", "reserva", "viagem"],
+    id: "debts",
+    keywords: ["dívida", "divida", "dívidas", "dividas", "parcela", "emprestimo", "empréstimo"],
     reply:
-      "Dívidas: registre o que deve e marque pagamentos do mês. Metas: defina um alvo (reserva, viagem…) e registre aportes quando guardar dinheiro.",
+      "Em Dívidas registre o que deve e marque pagamentos do mês. Dá para simular amortização na própria tela.",
+  },
+  {
+    id: "goals",
+    keywords: ["meta", "metas", "aporte", "reserva", "viagem", "objetivo"],
+    reply:
+      "Em Metas defina um alvo (reserva, viagem…) e registre aportes quando guardar dinheiro. O progresso aparece na lista.",
   },
   {
     id: "investments",
-    keywords: ["investir", "investimento", "investimentos", "carteira", "renda fixa", "corretora"],
+    keywords: ["investir", "investimento", "investimentos", "renda fixa", "corretora", "ação"],
     reply:
-      "Em Investimentos você registra a carteira e os aportes à mão. Nesta versão não há cotação automática nem conexão com corretora.",
+      "Em Investimentos registre a carteira e os aportes à mão. Não há cotação automática nem conexão com corretora nesta versão.",
+  },
+  {
+    id: "insights",
+    keywords: ["insight", "insights", "dica", "conselheiro", "analise", "análise"],
+    reply:
+      "Em Insights você vê leituras a partir dos lançamentos (categorias fortes, comparação com o mês passado, sobra → meta). É parte do Pro (liberado na degustação e na assinatura).",
   },
   {
     id: "income",
-    keywords: ["renda", "freela", "freelance", "salário", "salario", "extra", "ganho"],
+    keywords: ["renda", "freela", "freelance", "salário", "salario", "uber", "extra"],
     reply:
-      "A área Renda concentra o que você ganha (salário, freela etc.) e preferências de renda. Se a entrada não é só um salário fixo, é o lugar certo para organizar.",
+      "A área Renda organiza o que você ganha (salário, freela, apps). Preferências de onboarding ajudam a montar as abas certas.",
   },
   {
     id: "notifications",
     keywords: ["aviso", "avisos", "lembrete", "lembretes", "notificação", "notificacao", "sino", "atrasado"],
     reply:
-      "O sino mostra alertas de vencimentos próximos ou atrasados com base no que você cadastrou. Lembrete por e-mail entra no plano futuro (Pro); hoje o foco é o aviso dentro do app.",
+      "O sino mostra vencimentos próximos ou atrasados com base no que você cadastrou. E-mails de lembrete entram para quem está no Pro/degustação.",
   },
   {
-    id: "mobile",
-    keywords: ["celular", "mobile", "telefone", "android", "iphone", "instalar", "app store", "play store"],
+    id: "import_coming",
+    phrases: ["importar csv", "importar extrato", "conectar banco"],
+    keywords: ["importar", "csv", "ofx", "extrato", "nubank", "open finance", "sincronizar"],
     reply:
-      "Não precisa instalar: abra o site no navegador do celular ou do computador. No celular o menu inferior ajuda a navegar. Ainda não há app nas lojas.",
+      "Importação automática de extrato ainda não está liberada. Por enquanto use + Lançar. Nunca pedimos senha do banco.",
   },
   {
-    id: "privacy",
+    id: "billing",
+    phrases: ["cancelar assinatura", "pagou este mes", "degustacao", "primeiro mes"],
     keywords: [
-      "privado",
-      "privacidade",
-      "seguro",
-      "segurança",
-      "seguranca",
-      "dados",
-      "lgpd",
-      "senha do banco",
-      "anúncio",
-      "anuncio",
-    ],
-    reply:
-      "Cada pessoa só vê os próprios registros. Não vendemos dados e não tem anúncio no app. Nunca pedimos senha do banco, cartão ou app financeiro. Use senha forte e confirme o e-mail da conta.",
-  },
-  {
-    id: "pricing",
-    keywords: [
+      "assinatura",
+      "assinar",
       "preço",
       "preco",
       "plano",
       "pro",
-      "grátis",
-      "gratis",
-      "assinatura",
       "pagar",
       "cobrança",
       "cobranca",
+      "cancelar",
       "mercado pago",
+      "degustação",
+      "mensal",
+      "anual",
     ],
     reply:
-      "No cadastro você ganha o primeiro mês completo (sem cartão) pra degustar. Depois desse mês, para continuar é preciso assinar — não tem plano grátis eterno. Pro: R$ 12,90/mês ou R$ 108,36/ano (~30% off). Em Assinatura você vê se pagou o mês, o histórico e cancela a recorrência.",
+      "Você tem o primeiro mês completo na degustação. Depois, para continuar, assine em Assinatura (menu da conta): mensal R$ 12,90 ou anual R$ 108,36 (~30% off). Lá você vê se pagou o ciclo, o histórico e cancela a recorrência.",
+  },
+  {
+    id: "privacy",
+    keywords: ["privado", "privacidade", "seguro", "segurança", "seguranca", "dados", "lgpd"],
+    reply:
+      "Cada conta só vê os próprios registros. Não vendemos dados e não tem anúncio. Nunca pedimos senha de banco. Detalhes em /privacidade.",
   },
 ];
 
@@ -205,14 +181,27 @@ function normalize(text: string) {
 }
 
 export type MatchResult =
-  | { intentId: string; reply: string; escalated: false }
-  | { intentId: null; reply: string; escalated: true };
+  | { intentId: string; reply: string; escalated: false; openFeedback?: boolean }
+  | { intentId: null; reply: string; escalated: true; openFeedback?: boolean };
 
 const ESCALATE_REPLY =
-  "Não tenho uma resposta pronta pra isso, mas já registrei sua mensagem para o time do Te Organiza. Se deixou e-mail, respondemos por lá. Enquanto isso, pergunte sobre login, lançar gasto, painel, recorrentes, metas ou planos.";
+  "Não tenho uma resposta pronta. Já registrei pra o time. Enquanto isso, pergunte sobre lançar gasto, painel, recorrentes, metas, Insights ou assinatura — ou use “Sugerir melhoria”.";
+
+export function isFeedbackIntent(rawMessage: string): boolean {
+  const message = normalize(rawMessage);
+  const intent = SUPPORT_INTENTS.find((i) => i.id === "feedback");
+  if (!intent) return false;
+  for (const p of intent.phrases ?? []) {
+    if (message.includes(normalize(p))) return true;
+  }
+  for (const kw of intent.keywords) {
+    if (message.includes(normalize(kw))) return true;
+  }
+  return false;
+}
 
 /**
- * Simple keyword scorer — highest score wins; below threshold → escalate.
+ * Keyword + phrase scorer — frases longas pesam mais; threshold → escalate.
  */
 export function matchSupportIntent(rawMessage: string): MatchResult {
   const message = normalize(rawMessage);
@@ -224,31 +213,55 @@ export function matchSupportIntent(rawMessage: string): MatchResult {
     };
   }
 
-  let best: { id: string; reply: string; score: number } | null = null;
+  let best: {
+    id: string;
+    reply: string;
+    score: number;
+    openFeedback?: boolean;
+  } | null = null;
 
   for (const intent of SUPPORT_INTENTS) {
     let score = 0;
+    for (const phrase of intent.phrases ?? []) {
+      const needle = normalize(phrase);
+      if (!needle) continue;
+      if (message.includes(needle)) score += 6 + Math.min(needle.length / 10, 4);
+    }
     for (const kw of intent.keywords) {
       const needle = normalize(kw);
       if (!needle) continue;
       if (message === needle) score += 5;
-      else if (message.includes(needle)) score += 2;
+      else if (message.includes(needle)) {
+        // palavras curtas (ex.: "acao") exigem match mais forte
+        score += needle.length >= 5 ? 3 : 1;
+      }
     }
     if (score > 0 && (!best || score > best.score)) {
-      best = { id: intent.id, reply: intent.reply, score };
+      best = {
+        id: intent.id,
+        reply: intent.reply,
+        score,
+        openFeedback: intent.openFeedback,
+      };
     }
   }
 
-  if (!best || best.score < 2) {
+  if (!best || best.score < 3) {
     return { intentId: null, reply: ESCALATE_REPLY, escalated: true };
   }
 
-  return { intentId: best.id, reply: best.reply, escalated: false };
+  return {
+    intentId: best.id,
+    reply: best.reply,
+    escalated: false,
+    openFeedback: best.openFeedback,
+  };
 }
 
 export const SUPPORT_SHORTCUTS = [
-  { label: "Como lançar um gasto?", message: "Como eu registro um gasto no app?" },
-  { label: "Esqueci a senha / login", message: "Não consigo entrar ou confirmar e-mail" },
-  { label: "O que tem no painel?", message: "Como funciona o painel e o saldo do mês?" },
-  { label: "Planos e preços", message: "Quais são os planos grátis e Pro?" },
+  { label: "Como lançar?", message: "Como eu registro um gasto no app?", kind: "chat" as const },
+  { label: "Painel / saldo", message: "Como funciona o painel e o saldo do mês?", kind: "chat" as const },
+  { label: "Recorrentes", message: "Como uso recorrentes e marco como pago?", kind: "chat" as const },
+  { label: "Assinatura", message: "Como funciona a assinatura e cancelar?", kind: "chat" as const },
+  { label: "Sugerir melhoria", message: "Quero sugerir uma melhoria", kind: "feedback" as const },
 ] as const;

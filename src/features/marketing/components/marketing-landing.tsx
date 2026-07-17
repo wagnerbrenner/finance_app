@@ -1,10 +1,14 @@
 import Link from "next/link";
-import { BrandLogo, BrandMascot } from "@/shared/components/brand-media";
+import { BrandMascot } from "@/shared/components/brand-media";
 import { BRAND } from "@/shared/lib/brand";
 import { BILLING } from "@/shared/lib/billing";
 import { Button } from "@/components/ui/button";
 import { MarketingFaq } from "@/features/marketing/components/marketing-faq";
 import { MarketingDemo } from "@/features/marketing/components/marketing-demo";
+import {
+  MarketingFooter,
+  MarketingHeader,
+} from "@/features/marketing/components/marketing-page-shell";
 
 const CAN_DO = [
   {
@@ -32,6 +36,27 @@ const FOR_WHOM = [
   "Quem quer organizar sem virar “especialista em Excel”",
 ];
 
+const TRUST = [
+  "Sem cartão no 1º mês",
+  "Cancele a recorrência quando quiser",
+  "Seus dados só você vê",
+];
+
+const WHY_SUBSCRIBE = [
+  {
+    title: "Clareza do mês real",
+    body: "Um mês lançando de verdade mostra se o hábito cola — sem chute.",
+  },
+  {
+    title: "Insights que acompanham você",
+    body: "Sugestões a partir do que você anota, não de planilha genérica.",
+  },
+  {
+    title: "Tudo num lugar só",
+    body: "Painel, recorrentes, metas e dívidas sem abas infinitas no Excel.",
+  },
+];
+
 export function MarketingLanding() {
   return (
     <div className="relative min-h-svh overflow-x-hidden bg-[#070B14] font-sans text-[#E8EEF7]">
@@ -47,32 +72,9 @@ export function MarketingLanding() {
         }}
       />
 
-      <header className="sticky top-0 z-20 border-b border-white/5 bg-[#070B14]/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-8">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 font-[family-name:var(--font-display)] text-lg font-semibold tracking-tight text-cyan-300"
-          >
-            <BrandLogo size={28} priority className="size-7" />
-            {BRAND.name}
-          </Link>
-          <div className="flex items-center gap-2">
-            <Link href="/login">
-              <Button variant="ghost" className="text-slate-200 hover:bg-cyan-500/10 hover:text-white">
-                Entrar
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="bg-cyan-500 text-slate-950 hover:bg-cyan-400">
-                Mês grátis
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <MarketingHeader />
 
       <main className="relative z-10">
-        {/* Hero — brand first */}
         <section className="mx-auto max-w-6xl px-5 pb-14 pt-10 md:px-8 md:pb-20 md:pt-14">
           <div className="grid items-center gap-10 md:grid-cols-[1.05fr_0.95fr] md:gap-12">
             <div>
@@ -87,8 +89,8 @@ export function MarketingLanding() {
               </h1>
               <p className="mt-5 max-w-lg text-base leading-relaxed text-slate-400 md:text-lg">
                 Anote o que entra e o que sai. Em minutos você enxerga o mês — e no cadastro ganha o{" "}
-                <span className="text-slate-200">primeiro mês completo de Pro</span> pra sentir se
-                faz sentido assinar.
+                <span className="text-slate-200">primeiro mês completo</span> pra sentir se faz
+                sentido assinar.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href="/signup">
@@ -96,18 +98,18 @@ export function MarketingLanding() {
                     Quero meu mês grátis
                   </Button>
                 </Link>
-                <Link href="/login">
+                <Link href="/#precos">
                   <Button
                     size="lg"
                     variant="outline"
                     className="border-cyan-500/40 bg-transparent text-slate-100 hover:bg-cyan-500/10"
                   >
-                    Já tenho conta
+                    Ver preços
                   </Button>
                 </Link>
               </div>
               <p className="mt-4 text-xs text-slate-500">
-                {BRAND.tagline} Um mês pra testar de verdade · depois é assinatura.
+                {BRAND.tagline} Um mês pra testar · depois é assinatura.
               </p>
             </div>
 
@@ -122,8 +124,17 @@ export function MarketingLanding() {
           </div>
         </section>
 
-        {/* Pra quem */}
-        <section className="border-y border-white/5 bg-black/25 py-14 md:py-16">
+        <section className="border-y border-white/5 bg-black/30 py-6">
+          <ul className="mx-auto flex max-w-6xl flex-col gap-3 px-5 text-center text-sm text-slate-300 sm:flex-row sm:justify-center sm:gap-10 md:px-8">
+            {TRUST.map((line) => (
+              <li key={line} className="font-medium text-cyan-200/90">
+                {line}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="border-b border-white/5 bg-black/25 py-14 md:py-16">
           <div className="mx-auto max-w-6xl px-5 md:px-8">
             <h2 className="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight text-white md:text-3xl">
               Feito pra gente comum — de verdade
@@ -145,7 +156,6 @@ export function MarketingLanding() {
           </div>
         </section>
 
-        {/* O que dá pra fazer */}
         <section className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
           <h2 className="max-w-xl font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-white md:text-4xl">
             O que você consegue fazer
@@ -171,62 +181,49 @@ export function MarketingLanding() {
           </div>
         </section>
 
-        {/* Como começar — narrativa, não clone de 3 cards iguais */}
         <section className="border-y border-white/5 bg-gradient-to-b from-black/30 to-transparent py-16 md:py-20">
-          <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 md:grid-cols-2 md:px-8">
-            <div>
-              <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-white md:text-4xl">
-                Em três minutos você já está no ritmo
-              </h2>
-              <ol className="mt-8 space-y-6">
-                <li>
-                  <p className="text-xs font-medium uppercase tracking-wider text-amber-400">
-                    Conta
-                  </p>
-                  <p className="mt-1 text-slate-300">
-                    Crie com e-mail, confirme e entre. Categorias básicas já vêm prontas.
-                  </p>
-                </li>
-                <li>
-                  <p className="text-xs font-medium uppercase tracking-wider text-amber-400">
-                    Primeiro lançamento
-                  </p>
-                  <p className="mt-1 text-slate-300">
-                    Toque em + e registre um gasto ou uma receita. Sem segredo.
-                  </p>
-                </li>
-                <li>
-                  <p className="text-xs font-medium uppercase tracking-wider text-amber-400">
-                    Olhar o painel
-                  </p>
-                  <p className="mt-1 text-slate-300">
-                    Números e gráficos do mês atualizam com o que você anota — no seu tempo.
-                  </p>
-                </li>
-              </ol>
+          <div className="mx-auto max-w-6xl px-5 md:px-8">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-white md:text-4xl">
+              Por que assinar depois da degustação
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm text-slate-400 md:text-base">
+              O primeiro mês é pra você sentir o produto. Se colar, a assinatura mantém o ritmo —
+              sem plano grátis paralelo.
+            </p>
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {WHY_SUBSCRIBE.map((item) => (
+                <div
+                  key={item.title}
+                  className="rounded-2xl border border-cyan-500/15 bg-[#0B1220]/80 p-5"
+                >
+                  <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-white">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-400">{item.body}</p>
+                </div>
+              ))}
             </div>
-            <div className="rounded-3xl border border-cyan-500/20 bg-[#0B1220]/90 p-8 md:p-10">
-              <p className="font-[family-name:var(--font-display)] text-xl font-semibold leading-snug text-white md:text-2xl">
-                “Anotei o café, o mercado e o aluguel. No fim da semana eu já sabia onde o dinheiro
-                estava indo.”
-              </p>
-              <p className="mt-4 text-sm text-slate-500">— Como a gente imagina o seu primeiro mês</p>
+            <div className="mt-8">
+              <Link href="/signup">
+                <Button className="bg-amber-500 text-slate-950 hover:bg-amber-400">
+                  Começar meu mês grátis
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
 
-        {/* Degustação */}
         <section className="mx-auto max-w-6xl px-5 py-12 md:px-8">
           <div className="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/10 via-[#0B1220] to-cyan-500/10 px-6 py-8 md:px-10 md:py-10">
             <p className="text-xs font-medium uppercase tracking-wider text-amber-400">
               Degustação
             </p>
             <h2 className="mt-2 max-w-2xl font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight text-white md:text-3xl">
-              Um mês inteiro de Pro pra você decidir com calma
+              Um mês inteiro pra decidir com calma
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-400 md:text-base">
-              Acesso completo desde o dia 1 — sem pedir cartão. Use o mês inteiro. Se fizer sentido,
-              assina e segue. Se não assinar, o app fica pausado até a assinatura.
+              Acesso completo desde o dia 1 — sem pedir cartão. Se não assinar depois, o app fica
+              pausado até a assinatura.
             </p>
             <ul className="mt-6 grid gap-2 text-sm text-slate-300 sm:grid-cols-3">
               <li className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
@@ -242,14 +239,12 @@ export function MarketingLanding() {
           </div>
         </section>
 
-        {/* Preços */}
         <section id="precos" className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
           <h2 className="text-center font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-white md:text-4xl">
             Um mês pra sentir. Depois, assinatura.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-center text-sm text-slate-400">
-            Não tem plano grátis eterno depois da degustação — assim o produto se sustenta e você
-            decide com um mês real de uso.
+            Sem plano grátis eterno depois da degustação — você decide com um mês real de uso.
           </p>
           <div className="mx-auto mt-10 max-w-lg">
             <div className="relative rounded-2xl border border-amber-500/40 bg-[#0B1220]/90 p-6 shadow-[0_0_40px_rgba(245,158,11,0.1)] md:p-8">
@@ -287,17 +282,25 @@ export function MarketingLanding() {
           </div>
         </section>
 
-        {/* FAQ */}
         <section className="border-t border-white/5 bg-black/20 py-16 md:py-20">
           <div className="mx-auto max-w-6xl px-5 md:px-8">
             <h2 className="mb-8 text-center font-[family-name:var(--font-display)] text-3xl font-semibold text-white">
               Dúvidas comuns
             </h2>
             <MarketingFaq />
+            <p className="mt-8 text-center text-sm text-slate-500">
+              Quer saber mais?{" "}
+              <Link href="/sobre" className="text-cyan-400 hover:underline">
+                Sobre
+              </Link>
+              {" · "}
+              <Link href="/novidades" className="text-cyan-400 hover:underline">
+                Novidades
+              </Link>
+            </p>
           </div>
         </section>
 
-        {/* CTA final */}
         <section className="mx-auto max-w-3xl px-5 py-16 text-center md:px-8 md:pb-24">
           <BrandMascot className="mx-auto mb-6 w-28 opacity-90" />
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-white md:text-4xl">
@@ -315,22 +318,7 @@ export function MarketingLanding() {
         </section>
       </main>
 
-      <footer className="relative z-10 border-t border-white/5 py-8">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 text-xs text-slate-500 md:flex-row md:px-8">
-          <p>
-            {BRAND.name} · {new Date().getFullYear()}
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/signup" className="hover:text-cyan-300">
-              Criar conta
-            </Link>
-            <Link href="/login" className="hover:text-cyan-300">
-              Entrar
-            </Link>
-            <span className="text-slate-600">Privacidade · Termos (em breve)</span>
-          </div>
-        </div>
-      </footer>
+      <MarketingFooter />
     </div>
   );
 }
